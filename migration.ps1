@@ -349,8 +349,8 @@ Else {
 
 # Clear OneDrive credentials unless script has been run previously
 If ($OneDriveUnlinked1 -eq $false -and $OneDriveUnlinked2 -eq $false){
-    Install-Module -Name pscredentialmanager -Scope CurrentUser
-    Install-Module -Name CredentialManager -Scope CurrentUser
+    Install-Module -Name pscredentialmanager -Scope CurrentUser -force
+    Install-Module -Name CredentialManager -Scope CurrentUser -force
     $onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
     If($onedrive -ne $null) {
         remove-storedcredential -target $onedrive.name
