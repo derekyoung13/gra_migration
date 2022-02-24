@@ -364,24 +364,32 @@ Else {
 # Clear OneDrive credentials unless script has been run previously
 $OneDriveCache = Test-Path -Path C:\Migration\onedrive-cached-creds-cleared.txt
 If ($OneDriveCache -eq $false){
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
-    Install-Module -Name pscredentialmanager -Scope CurrentUser -force
-    Install-Module -Name CredentialManager -Scope CurrentUser -force
-    $onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
-    If($onedrive -ne $null) {
-        remove-storedcredential -target $onedrive.name
-        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " Cleared Cached OneDrive Credentials"
-        Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
-    	New-Item -Path C:\Migration\onedrive-cached-creds-cleared.txt
+    Try {
+		Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
+		Install-Module -Name pscredentialmanager -Scope CurrentUser -force
+		Install-Module -Name CredentialManager -Scope CurrentUser -force
+		$onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
+		If($onedrive -ne $null) {
+			remove-storedcredential -target $onedrive.name
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Cleared Cached OneDrive Credentials"
+			Write-Host $output
+			$output | out-file -append "C:\migration\_log.txt"
+			New-Item -Path C:\Migration\onedrive-cached-creds-cleared.txt
+		}
+		Else {
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " No Cached OneDrive Credentials to clear"
+			Write-Host $output
+			$output | out-file -append "C:\migration\_log.txt"
+		}
     }
-    Else {
-        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " No Cached OneDrive Credentials to clear"
-        Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
-    }
+	Catch {
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$errormessage=$timestamp + " ERROR: " + $_.ToString()
+		Write-Warning $errormessage
+		$errormessage | out-file -append "C:\migration\_log.txt"
+	}
 }
 
 # Begin Office Activation logout
