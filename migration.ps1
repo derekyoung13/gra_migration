@@ -59,39 +59,39 @@ If ($TeamsCache -eq $false){
             $ErrorActionPreference = 'stop'
             $Blob = Test-Path -Path $env:APPDATA\"Microsoft\teams\blob_storage"
             If( $Blob -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\blob_storage" | Remove-Item -Recurse -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\blob_storage" | Remove-Item -Recurse
             }
             $db = Test-Path -Path $env:APPDATA\"Microsoft\teams\databases"
             If( $db -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\databases" | Remove-Item -Recurse -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\databases" | Remove-Item -Recurse
             }
             $cache = Test-Path -Path $env:APPDATA\"Microsoft\teams\cache"
             If( $cache -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\cache" | Remove-Item -Recurse -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\cache" | Remove-Item -Recurse
             }
             $gpucache = Test-Path -Path $env:APPDATA\"Microsoft\teams\gpucache"
             If( $gpucache -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\gpucache" | Remove-Item -Recurse -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\gpucache" | Remove-Item -Recurse
             }
             $Indexeddb = Test-Path -Path $env:APPDATA\"Microsoft\teams\Indexeddb"
             If( $Indexeddb -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\Indexeddb" | Remove-Item -Recurse -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\Indexeddb" | Remove-Item -Recurse
             }
             $local = Test-Path -Path $env:APPDATA\"Microsoft\teams\Local Storage"
             If( $local -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\Local Storage" | Remove-Item -Recurse -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\Local Storage" | Remove-Item -Recurse
             }
             $tmp = Test-Path -Path $env:APPDATA\"Microsoft\teams\tmp"
             If( $tmp -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\tmp" | Remove-Item -Recurse -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\tmp" | Remove-Item -Recurse
             }
             $cookies = Test-Path -Path $env:APPDATA\"Microsoft\teams\Cookies"
             If( $cookies -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\Cookies" | Remove-Item -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\Cookies" | Remove-Item
             }
             $storage = Test-Path -Path $env:APPDATA\"Microsoft\teams\storage.json"
             If( $storage -eq $True) {
-                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\storage.json" | Remove-Item -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\storage.json" | Remove-Item
             }
 		# If no errors renaming folder, log success and write file to c:\Migration\teams-folder-rename.txt so script doesnt repeat action
 	        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
