@@ -170,13 +170,27 @@ If($TeamsModifyDesktopConfig -eq $false) {
 	Write-Host $output
 	$output | out-file -append "C:\migration\_log.txt"
 	# Modify desktop-Config.json
-	$desktopConfig.isLoggedOut = $true
-	$desktopConfig.upnWindowUserUpn =""; #The email used to sign in
-	$desktopConfig.userUpn ="";
-	$desktopConfig.userOid ="";
-	$desktopConfig.userTid = "";
-	$desktopConfig.homeTenantId ="";
-	$desktopConfig.webAccountId="";
+	if($desktopConfig.isLoggedOut -ne $null) {
+		$desktopConfig.isLoggedOut = $true
+	}
+	if($desktopConfig.upnWindowUserUpn -ne $null) {
+		$desktopConfig.upnWindowUserUpn =""; #The email used to sign in
+	}
+	if($desktopConfig.userUpn -ne $null) {
+		$desktopConfig.userUpn ="";
+	}
+	if($desktopConfig.userOid -ne $null) {
+		$desktopConfig.userOid ="";
+	}
+	if($desktopConfig.userTid -ne $null) {
+		$desktopConfig.userTid = "";
+	}
+	if($desktopConfig.homeTenantId -ne $null) {
+		$desktopConfig.homeTenantId ="";
+	}
+	if($desktopConfig.webAccountId -ne $null) {
+		$desktopConfig.webAccountId="";
+	}
 	$desktopConfig | ConvertTo-Json -Compress | Set-Content -Path $SourceDesktopConfigFile -Force
 	# If no errors modifying desktop-config, log success
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
