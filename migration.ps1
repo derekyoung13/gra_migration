@@ -956,7 +956,7 @@ If($OfficeData -eq $False) {
 	    $errormessage | out-file -append $loglocation
     }
 }
-
+# Clear saved credentials
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Clearing Windows Credentials"
 #write-host $output
@@ -967,15 +967,21 @@ Foreach ($Target in $Credentials) {
     $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
     $Argument = "/delete:" + $Target
     Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-    }
+ }
 
-# Clear saved credentials
+$Credentials = (cmdkey /list | Where-Object {$_ -like "*outlook.office365.com*"})
+Foreach ($Target in $Credentials) {
+    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+    $Argument = "/delete:" + $Target
+    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+}
+
 $Credentials = (cmdkey /list | Where-Object {$_ -like "*SSO_POP_Device*"})
 Foreach ($Target in $Credentials) {
     $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
     $Argument = "/delete:" + $Target
     Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-    }
+}
 #write-host "****** Clearing SSO_POP_Device Credentials : Complete ******"
 
 $Credentials = (cmdkey /list | Where-Object {$_ -like "*virtualapp/didlogical*"})
@@ -983,7 +989,7 @@ Foreach ($Target in $Credentials) {
     $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
     $Argument = "/delete:" + $Target
     Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-    }
+}
 #write-host "****** Clearing virtualapp/didlogical Credentials : Complete ******"
 
 $Credentials = (cmdkey /list | Where-Object {$_ -like "*msteams*"})
@@ -991,8 +997,15 @@ Foreach ($Target in $Credentials) {
     $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
     $Argument = "/delete:" + $Target
     Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-    }
+}
 #write-host "****** Clearing Teams Credentials : Complete ******"
+
+$Credentials = (cmdkey /list | Where-Object {$_ -like "*XboxLive*"})
+Foreach ($Target in $Credentials) {
+    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+    $Argument = "/delete:" + $Target
+    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+    }
 
 # Try to remove the Link School/Work account if there was one. It can be created if the first time you sign in, the user all
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
