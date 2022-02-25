@@ -1,27 +1,30 @@
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-# Test the path C:\Migration is there, create it if it deosnt exist
-$Migrationfolder = Test-Path C:\Migration
+# Test the path $env:USERPROFILE + "\migration is there, create it if it doesn't exist
+$Migrationfolder = Test-Path $env:USERPROFILE"\migration"
 If($Migrationfolder -eq $False) {
     Try {
         $ErrorActionPreference = 'stop'
-        New-Item -Path "C:\" -Name "Migration" -ItemType "directory"
+        New-Item -Path $env:USERPROFILE -Name "Migration" -ItemType "directory"
     }
     Catch {
         # If there is an error, log the error
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	$errormessage=$timestamp + " ERROR: " + $_.ToString()
-	Write-Host $error[0].Exception.GetType().FullName
-	Write-Host $errormessage -ForegroundColor Red
+	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
+	    Write-Host $error[0].Exception.GetType().FullName
+	    Write-Host $errormessage -ForegroundColor Red
     }
 }
 
+$loglocation = $env:USERPROFILE + "\migration\log.txt"
+$outputlocation = $env:USERPROFILE + "\migration"
+
 # Begin Teams sign out
-" " | out-file -append "C:\migration\_log.txt"
+" " | out-file -append $loglocation
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Teams sign out"
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
 
 # Get MS Teams process. Only using 'SilentlyContinue' as we test this below
 $TeamsProcess = Get-Process Teams -ErrorAction SilentlyContinue
@@ -35,8 +38,8 @@ If ($TeamsProcess) {
     Start-Sleep 3
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Teams process was running, so we stopped it"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 
 If ($OutlookProcess) {
@@ -44,13 +47,13 @@ If ($OutlookProcess) {
     $OutlookProcess | Stop-Process -Force | Wait-Process
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Outlook process was running, so we stopped it"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 
 # Clear Teams cached folders under %appdata%\Microsoft\Teams
 # Check if teams folder cache was already cleared by script
-$TeamsCache = Test-Path -Path C:\Migration\teams-cache-cleared.txt
+$TeamsCache = Test-Path -Path $outputlocation\teams-cache-cleared.txt
 If ($TeamsCache -eq $false){
     $TeamsFolderCheck = Test-Path -Path $env:APPDATA\"Microsoft\Teams"
     If ($TeamsFolderCheck -eq $true) {
@@ -93,70 +96,70 @@ If ($TeamsCache -eq $false){
             If( $storage -eq $True) {
                 Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\storage.json" | Remove-Item
             }
-		# If no errors renaming folder, log success and write file to c:\Migration\teams-folder-rename.txt so script doesnt repeat action
+		    # If no errors renaming folder, log success
 	        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $output = $timestamp + " Teams cache was cleared and user was signed out"
-            	Write-Host $output
-	        $output | out-file -append "C:\migration\_log.txt"
-            	New-Item C:\Migration\teams-cache-cleared.txt
+        	#write-host $output
+	        $output | out-file -append $loglocation
+        	New-Item $outputlocation\teams-cache-cleared.txt
         }
         Catch {
 		# If there is an error, log the error
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$errormessage=$timestamp + " ERROR: " + $_.ToString()
-		Write-Host $error[0].Exception.GetType().FullName
-		Write-Host $errormessage -ForegroundColor Red
-		$errormessage | out-file -append "C:\migration\_log.txt"
+		#write-host $error[0].Exception.GetType().FullName
+		#write-host $errormessage -ForegroundColor Red
+		$errormessage | out-file -append $loglocation
         }
     }
     Else {
         # If 'Teams' folder does not exist notify user then break
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	$output = $timestamp + " Teams folder not found"
-	Write-Host $output
-	$output | out-file -append "C:\migration\_log.txt"
+	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+	    $output = $timestamp + " Teams folder not found"
+	    #write-host $output
+	    $output | out-file -append $loglocation
     }
 }
 Else {
     # If 'Teams' folder was already renamed then skip
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " SKIPPING: Teams folder was already renamed "
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 
 # Check if HomeUserUpn for teams was cleared by script
-$TeamsUserClear = Test-Path -Path C:\Migration\teams-homeuserupn-cleared.txt
+$TeamsUserClear = Test-Path -Path $outputlocation\teams-homeuserupn-cleared.txt
 If ($TeamsUserClear -eq $false){
     Try { 
         $ErrorActionPreference = 'stop'
         Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Office\Teams" -Name "HomeUserUpn"
-        # If no errors clearing HomeUserUpn, log success and write file to c:\Migration\teams-username-cleared.txt so script doesnt repeat action
+        # If no errors clearing HomeUserUpn, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Registry entry deleted: HKCU:\Software\Microsoft\Office\Teams\HomeUserUpn"
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\teams-homeuserupn-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\teams-homeuserupn-cleared.txt
     }
     Catch {
 	# If there is an error, log the error
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	$errormessage=$timestamp + " ERROR: " + $_.ToString()
-	Write-Host $error[0].Exception.GetType().FullName
-	Write-Host $errormessage -ForegroundColor Red
-	$errormessage | out-file -append "C:\migration\_log.txt"
+	#write-host $error[0].Exception.GetType().FullName
+	#write-host $errormessage -ForegroundColor Red
+	$errormessage | out-file -append $loglocation
     }
 }
 # If HomeUserUpn was cleared before then skip
 Else {
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " SKIPPING: Teams HomeUserUpn was already cleared "
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 # Modify desktop-Config.Json under %appdata%\Microsoft\Teams
 # Check if modify desktop-Config.json was already done by script
-$TeamsModifyDesktopConfig = Test-Path -Path C:\Migration\teams-modify-desktop-config.txt
+$TeamsModifyDesktopConfig = Test-Path -Path $outputlocation\teams-modify-desktop-config.txt
 If($TeamsModifyDesktopConfig -eq $false) {
     Try { 
 	# Import desktop-Config.json
@@ -167,8 +170,8 @@ If($TeamsModifyDesktopConfig -eq $false) {
 	# If no errors importing desktop-config, log success
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	$output = $timestamp + " " + $TeamsFolder + "\desktop-Config/json imported successfuly"
-	Write-Host $output
-	$output | out-file -append "C:\migration\_log.txt"
+	#write-host $output
+	$output | out-file -append $loglocation
 	# Modify desktop-Config.json
 	if($desktopConfig.isLoggedOut -ne $null) {
 		$desktopConfig.isLoggedOut = $true
@@ -195,40 +198,40 @@ If($TeamsModifyDesktopConfig -eq $false) {
 	# If no errors modifying desktop-config, log success
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	$output = $timestamp + " " + $TeamsFolder + "\desktop-Config/json modified successfuly"
-	Write-Host $output
-	$output | out-file -append "C:\migration\_log.txt"
-	New-Item C:\Migration\teams-modify-desktop-config.txt
+	#write-host $output
+	$output | out-file -append $loglocation
+	New-Item $outputlocation\teams-modify-desktop-config.txt
     }
     Catch {
 	# If there is an error, log the error
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	$errormessage=$timestamp + " ERROR: " + $_.ToString()
-	Write-Host $error[0].Exception.GetType().FullName
-	Write-Host $errormessage -ForegroundColor Red
-	$errormessage | out-file -append "C:\migration\_log.txt"
+	#write-host $error[0].Exception.GetType().FullName
+	#write-host $errormessage -ForegroundColor Red
+	$errormessage | out-file -append $loglocation
     }
 }
 # If script desktop-Config.json was already modified then skip
 Else {
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " SKIPPING: desktop-Config.json was already modified"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 
 # Begin Outlook new profile creation
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: New profile creation for Outlook "
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
 # Check if new profile was created
 $NewOutlookProfile = Test-Path -Path HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New
 If ($NewOutlookProfile -eq $True) {
     # If profile was created, skip profile creation
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " SKIPPING: Outlook profile 'Outlook-New' was already created"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 Else {
     # If profile was was not created, create new profile
@@ -239,8 +242,8 @@ Else {
         $OutlookProcess | Stop-Process -Force  | Wait-Process
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Outlook process was running, so we stopped it"
-        Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
+        #write-host $output
+		$output | out-file -append $loglocation
     }
     Try {
         # Create new Outlook profile named 'Outlook-New'
@@ -249,15 +252,15 @@ Else {
         # If no errors creating the new profile, log success
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " RegKey created: HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New"
-		Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
+		#write-host $output
+		$output | out-file -append $loglocation
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$errormessage=$timestamp + " ERROR: " + $_.ToString()
-		Write-Warning $errormessage
-		$errormessage | out-file -append "C:\migration\_log.txt"
+		#write-warning $errormessage
+		$errormessage | out-file -append $loglocation
     }
 }
 # Check if default profile has been set to Outlook-New
@@ -265,8 +268,8 @@ $DefaultProfile = Get-ItemProperty -Path HKCU:\Software\Microsoft\Office\16.0\Ou
 If($DefaultProfile.defaultprofile -eq "Outlook-New") {
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " SKIPPING: Default Outlook profile already set to Outlook-New"
-    Write-Host $output
-	$output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+	$output | out-file -append $loglocation
 }
 Else {
     # If 'Outlook' process is running, stop it else do nothing
@@ -274,7 +277,7 @@ Else {
     $OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
     If ($OutlookProcess) {
         $OutlookProcess | Stop-Process -Force | Wait-Process
-        Write-Host "Outlook process was running, so we stopped it" -ForegroundColor Green
+        #write-host "Outlook process was running, so we stopped it" -ForegroundColor Green
     }
     Try {
         # Set default Outlook profile to 'Outlook-New'
@@ -283,25 +286,56 @@ Else {
         # If no errors setting the default Outlook profile, log success
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Reg string created: 'HKCU:\Software\Microsoft\Office\16.0\Outlook\DefaultProfile' with value 'Outlook-New'"
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
+        #write-host $output
+	    $output | out-file -append $loglocation
     }
     # If there was an error, log the error
     Catch {
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
 # Begin OneDrive sign out and unlink
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: OneDrive sign out and unlink"
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
+# Clear OneDrive credentials unless script has been run previously
+$OneDriveCache = Test-Path -Path $outputlocation\onedrive-cached-creds-cleared.txt
+If ($OneDriveCache -eq $false){
+    Try {
+		Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
+        Install-Module -Name pscredentialmanager -Scope CurrentUser -force
+		Install-Module -Name CredentialManager -Scope CurrentUser -force
+		$onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
+		If($onedrive -ne $null) {
+			remove-storedcredential -target $onedrive.name
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Cleared Cached OneDrive Credentials"
+			#write-host $output
+			$output | out-file -append $loglocation
+			New-Item -Path $outputlocation\onedrive-cached-creds-cleared.txt
+		}
+		Else {
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " No Cached OneDrive Credentials to clear"
+			#write-host $output
+			$output | out-file -append $loglocation
+		}
+    }
+	Catch {
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$errormessage=$timestamp + " ERROR: " + $_.ToString()
+		#write-warning $errormessage
+		$errormessage | out-file -append $loglocation
+	}
+}
+
 # Clear registry path HKCU:\Software\Microsoft\OneDrive\Accounts\* to unlink OneDrive account 
-$OneDriveUnlinked1 = Test-Path -Path C:\Migration\onedrive-unlinked-1.txt
+$OneDriveUnlinked1 = Test-Path -Path $outputlocation\onedrive-unlinked-1.txt
 If ($OneDriveUnlinked1 -eq $false){
     # If OneDrive is open, close it
     $OneDriveProcess = Get-Process onedrive -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
@@ -312,26 +346,26 @@ If ($OneDriveUnlinked1 -eq $false){
         # If no errors deleting the registry keys, log success
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Registry cleared: HKCU:\Software\Microsoft\OneDrive\Accounts\*"
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item -Path C:\Migration\onedrive-unlinked-1.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item -Path $outputlocation\onedrive-unlinked-1.txt
     }
     # If there was an error, log the error
     Catch {
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$errormessage=$timestamp + " ERROR: " + $_.ToString()
-		Write-Warning $errormessage
-		$errormessage | out-file -append "C:\migration\_log.txt"
+		#write-warning $errormessage
+		$errormessage | out-file -append $loglocation
     }
 }
 Else {
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " SKIPPING: Registry already cleared: HKCU:\Software\Microsoft\OneDrive\Accounts\*"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 # Clear registry path HKCU:\software\microsoft\windows\currentversion\explorer\desktop\namespace\* to unlink OneDrive account 
-$OneDriveUnlinked2 = Test-Path -Path C:\Migration\onedrive-unlinked-2.txt
+$OneDriveUnlinked2 = Test-Path -Path $outputlocation\onedrive-unlinked-2.txt
 If ($OneDriveUnlinked2 -eq $false){
     # If OneDrive is open, close it
     $OneDriveProcess = Get-Process onedrive -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
@@ -342,54 +376,23 @@ If ($OneDriveUnlinked2 -eq $false){
         # If no errors deleting the registry keys, log success
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " Registry cleared: HKCU:\software\microsoft\windows\currentversion\explorer\desktop\namespace\*"
-        Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
-        New-Item -Path C:\Migration\onedrive-unlinked-2.txt
+        #write-host $output
+		$output | out-file -append $loglocation
+        New-Item -Path $outputlocation\onedrive-unlinked-2.txt
     }
     # If there was an error, log the error
     Catch {
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$errormessage=$timestamp + " ERROR: " + $_.ToString()
-		Write-Warning $errormessage
-		$errormessage | out-file -append "C:\migration\_log.txt"
+		#write-warning $errormessage
+		$errormessage | out-file -append $loglocation
     }
 }
 Else {
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " SKIPPING: Registry already cleared: HKCU:\software\microsoft\windows\currentversion\explorer\desktop\namespace\*"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
-}
-
-# Clear OneDrive credentials unless script has been run previously
-$OneDriveCache = Test-Path -Path C:\Migration\onedrive-cached-creds-cleared.txt
-If ($OneDriveCache -eq $false){
-    Try {
-		Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
-		Install-Module -Name pscredentialmanager -Scope CurrentUser -force
-		Install-Module -Name CredentialManager -Scope CurrentUser -force
-		$onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
-		If($onedrive -ne $null) {
-			remove-storedcredential -target $onedrive.name
-			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-			$output = $timestamp + " Cleared Cached OneDrive Credentials"
-			Write-Host $output
-			$output | out-file -append "C:\migration\_log.txt"
-			New-Item -Path C:\Migration\onedrive-cached-creds-cleared.txt
-		}
-		Else {
-			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-			$output = $timestamp + " No Cached OneDrive Credentials to clear"
-			Write-Host $output
-			$output | out-file -append "C:\migration\_log.txt"
-		}
-    }
-	Catch {
-		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$errormessage=$timestamp + " ERROR: " + $_.ToString()
-		Write-Warning $errormessage
-		$errormessage | out-file -append "C:\migration\_log.txt"
-	}
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 
 # Begin Office Activation logout
@@ -401,8 +404,8 @@ If ($TeamsProcess) {
     Start-Sleep 3
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Teams process was running, so we stopped it"
-    Write-Host $output
-	$output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+	$output | out-file -append $loglocation
 }
 Start-Sleep 3
 Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
@@ -416,8 +419,8 @@ Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -
 
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Clearing Office Activation sign in"
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
 
 $OfficeCommon = Get-Item Registry::HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common -ErrorAction SilentlyContinue
 
@@ -432,21 +435,21 @@ if($UserIdentityKeysCheck -eq $False) {
     $UserIdentityKeys = Get-ChildItem Registry::$IdentityKey\Identities -ErrorAction SilentlyContinue
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " No users logged into Office "
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 }
 else {
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " UserIdentityKeys: " + $UserIdentityKeys + "\Identities"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	# Iterates each Key under the Identity, and pulls the ProviderID which is an ID for each user logged in.
 	$UserIdentityKeys | foreach {
 		$CurrentProviderID = (Get-ItemProperty Registry::$_ -Name ProviderID -ErrorAction SilentlyContinue).ProviderID
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " CurrentProviderID: " + $CurrentProviderID
-		Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
+		#write-host $output
+		$output | out-file -append $loglocation
 		if([string]::IsNullOrWhiteSpace($SignedOutWAMUsers)) {
 			$SignedOutWAMUsers = $CurrentProviderID
 		}
@@ -458,8 +461,8 @@ else {
 	}
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	$output = $timestamp + " Generated SignedOutWAMUsers: " + $SignedOutWAMUsers
-	Write-Host $output
-	$output | out-file -append "C:\migration\_log.txt"
+	#write-host $output
+	$output | out-file -append $loglocation
 
 	#Compare the WAM to whats in the IdentityKey
 	$ExistingWAM = $IdentityKey.GetValue("SignedOutWAMUsers")
@@ -473,12 +476,12 @@ else {
 		}
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " Prior WAM Existed: " + $ExistingWAM
-		Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
+		#write-host $output
+		$output | out-file -append $loglocation
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " New WAM: " + $NewWam
-		Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"
+		#write-host $output
+		$output | out-file -append $loglocation
 		Set-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $NewWam -ErrorAction SilentlyContinue
 	}
 	else {
@@ -486,96 +489,96 @@ else {
 		New-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $SignedOutWAMUsers -ErrorAction SilentlyContinue
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " No Prior WAM, Creating new Value From Generated SignOutWAMUsers"
-		Write-Host $output
-		$output | out-file -append "C:\migration\_log.txt"		
+		#write-host $output
+		$output | out-file -append $loglocation		
 	}
 }
     # Check if Identities Subkey was already deleted by script
-    $IdentitiesKey = Test-Path -Path C:\Migration\office-identities-cleared.txt
+    $IdentitiesKey = Test-Path -Path $outputlocation\office-identities-cleared.txt
     If($IdentitiesKey -eq $False) { 
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Removing Identities Registry Key: " + $IdentityKey + "\Identities"
-        Write-Host $output
-        $output | out-file -append "C:\migration\_log.txt"
+        #write-host $output
+        $output | out-file -append $loglocation
 	    Try {
             $ErrorActionPreference = 'stop'
             Remove-Item Registry::$IdentityKey\Identities -Recurse
             # If no errors, log success
 	        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $output = $timestamp + " Removed: " + $IdentityKey + "\Identities"
-            Write-Host $output
-	        $output | out-file -append "C:\migration\_log.txt"
-            New-Item C:\Migration\office-identities-cleared.txt
+            #write-host $output
+	        $output | out-file -append $loglocation
+            New-Item $outputlocation\office-identities-cleared.txt
         }
         Catch {
             # If there is an error, log the error
             $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	        Write-Warning $errormessage
-	        $errormessage | out-file -append "C:\migration\_log.txt"
+	        #write-warning $errormessage
+	        $errormessage | out-file -append $loglocation
         }
     }
     # Check if Profiles Subkey was already deleted by script
-    $ProfileKey = Test-Path -Path C:\Migration\office-profiles-cleared.txt
+    $ProfileKey = Test-Path -Path $outputlocation\office-profiles-cleared.txt
     If($ProfileKey -eq $False) { 
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Removing Profiles Registry Key: " + $IdentityKey + "\Profiles"
-        Write-Host $output
-        $output | out-file -append "C:\migration\_log.txt"
+        #write-host $output
+        $output | out-file -append $loglocation
 	    Try {
             $ErrorActionPreference = 'stop'
             Remove-Item Registry::$IdentityKey\Profiles -Recurse
             # If no errors, log success
 	        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $output = $timestamp + " Removed: " + $IdentityKey + "\Profiles"
-            Write-Host $output
-	        $output | out-file -append "C:\migration\_log.txt"
-            New-Item C:\Migration\office-profiles-cleared.txt
+            #write-host $output
+	        $output | out-file -append $loglocation
+            New-Item $outputlocation\office-profiles-cleared.txt
         }
         Catch {
             # If there is an error, log the error
             $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	        Write-Warning $errormessage
-	        $errormessage | out-file -append "C:\migration\_log.txt"
+	        #write-warning $errormessage
+	        $errormessage | out-file -append $loglocation
         }
     }
 	
 	#This one, I noticed starts to populate with URLS if you save to OneDrive
 	#It also creates keys when Outlook the app is logged into and you select "Remember My Credentials".
     # Check if DocToIdMapping Subkey was already deleted by script
-    $DocToIdMappingKey = Test-Path -Path C:\Migration\office-DocToIdMapping-cleared.txt
+    $DocToIdMappingKey = Test-Path -Path $outputlocation\office-DocToIdMapping-cleared.txt
     If($DocToIdMappingKey -eq $False) { 
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Removing DocToIdMapping Registry Key: " + $IdentityKey + "\Profiles"
-        Write-Host $output
-        $output | out-file -append "C:\migration\_log.txt"
+        #write-host $output
+        $output | out-file -append $loglocation
 	    Try {
             $ErrorActionPreference = 'stop'
             Remove-Item Registry::$IdentityKey\DocToIdMapping\* -Recurse
              # If no errors, log success
 	        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $output = $timestamp + " Removed: " + $IdentityKey + "\DocToIdMapping\*"
-            Write-Host $output
-	        $output | out-file -append "C:\migration\_log.txt"
-            New-Item C:\Migration\office-DocToIdMapping-cleared.txt
+            #write-host $output
+	        $output | out-file -append $loglocation
+            New-Item $outputlocation\office-DocToIdMapping-cleared.txt
         }
         Catch {
             # If there is an error, log the error
             $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	        Write-Warning $errormessage
-	        $errormessage | out-file -append "C:\migration\_log.txt"
+	        #write-warning $errormessage
+	        $errormessage | out-file -append $loglocation
         }
     }	
 
 #Start Clearing out remanants that the user was logged in before#
-$CloudPolicyKey = Test-Path -Path C:\Migration\office-cloudpolicy-cleared.txt
+$CloudPolicyKey = Test-Path -Path $outputlocation\office-cloudpolicy-cleared.txt
 If($CloudPolicyKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing CloudPolicy Registry Key: " + $OfficeCommon + "\CloudPolicy"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $CloudPolicy = Get-Item Registry::$OfficeCommon\CloudPolicy
@@ -583,25 +586,25 @@ If($CloudPolicyKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $CloudPolicy
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-cloudpolicy-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-cloudpolicy-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     } 
 }
 
-$LicensingNextKey = Test-Path -Path C:\Migration\office-licensingnext-cleared.txt
+$LicensingNextKey = Test-Path -Path $outputlocation\office-licensingnext-cleared.txt
 If($LicensingNextKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing LicensingNext Registry Key: " + $OfficeCommon + "\Licensing\LicensingNext"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $LicensingNext = Get-Item Registry::$OfficeCommon\Licensing\LicensingNext
@@ -609,25 +612,25 @@ If($LicensingNextKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $LicensingNext
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-licensingnext-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-licensingnext-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     } 
 }
 
-$TemplatesKey = Test-Path -Path C:\Migration\office-templates-cleared.txt
+$TemplatesKey = Test-Path -Path $outputlocation\office-templates-cleared.txt
 If($TemplatesKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing Templates Registry Key: " + $OfficeCommon + "\OfficeStart\Web\Templates"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $WebTemplates = Get-Item Registry::$OfficeCommon\OfficeStart\Web\Templates
@@ -635,25 +638,25 @@ If($TemplatesKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $WebTemplates
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-templates-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-templates-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
-$SettingsStoreKey = Test-Path -Path C:\Migration\office-settingsstore-cleared.txt
+$SettingsStoreKey = Test-Path -Path $outputlocation\office-settingsstore-cleared.txt
 If($SettingsStoreKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing SettingsStore Registry Key: " + $OfficeCommon + "\Privacy\SettingsStore"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $SettingsStore =  Get-Item Registry::$OfficeCommon\Privacy\SettingsStore
@@ -661,25 +664,25 @@ If($SettingsStoreKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $SettingsStore
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-settingsstore-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-settingsstore-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
-$RoamIdKey = Test-Path -Path C:\Migration\office-roamid-cleared.txt
+$RoamIdKey = Test-Path -Path $outputlocation\office-roamid-cleared.txt
 If($RoamIdKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing RoamId Registry Key: " + $OfficeCommon + "\Roaming\Identities"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $RoamId  = Get-Item Registry::$OfficeCommon\Roaming\Identities
@@ -687,25 +690,25 @@ If($RoamIdKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $RoamId
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-roamid-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-roamid-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
-$SerManCacheKey = Test-Path -Path C:\Migration\office-sermancache-cleared.txt
+$SerManCacheKey = Test-Path -Path $outputlocation\office-sermancache-cleared.txt
 If($SerManCacheKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing SerManCache Registry Key: " + $OfficeCommon + "\ServicesManagerCache\Identities and \ServicesManagerCache\OnPremises"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $SerManCacheCheck = Test-Path -Path Registry::$OfficeCommon\ServicesManagerCache
@@ -717,26 +720,26 @@ If($SerManCacheKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $SerManCache + "\Identities and \OnPremises"
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-sermancache-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-sermancache-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
-Write-Host "-- Clearing TargetMessaging --"
-$TargetedMsgServKey = Test-Path -Path C:\Migration\office-targetedmsgserv-cleared.txt
+#write-host "-- Clearing TargetMessaging --"
+$TargetedMsgServKey = Test-Path -Path $outputlocation\office-targetedmsgserv-cleared.txt
 If($TargetedMsgServKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing TargetedMsgServ Registry Key: " + $OfficeCommon + "\TargetedMessagingService\MessageData and \TargetedMessagingService\MessageMetaData"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $TargetedMsgServCheck = Test-Path -Path Registry::$OfficeCommon\TargetedMessagingService
@@ -748,25 +751,25 @@ If($TargetedMsgServKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $TargetedMsgServ + "\MessageData and \MessageMetaData"
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-targetedmsgserv-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-targetedmsgserv-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
-$UrlRepkey = Test-Path -Path C:\Migration\office-urlrep-cleared.txt
+$UrlRepkey = Test-Path -Path $outputlocation\office-urlrep-cleared.txt
 If($UrlRepkey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing UrlRep Registry Key: " + $OfficeCommon + "\UrlReputation\UserPolicy"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $UrlRep = Get-Item Registry::$OfficeCommon\UrlReputation\UserPolicy
@@ -774,33 +777,33 @@ If($UrlRepkey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: " + $UrlRep
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-urlrep-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-urlrep-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
 #There are Registry Keys inside Office\16.0 (above Common) for each individual Office software.
 #The following is used to clear user data each of these may have stored of a previous user.
-Write-Host "-- Clearing App Specific Keys  --"
-$AppsKey = Test-Path -Path C:\Migration\office-apps-cleared.txt
+#write-host "-- Clearing App Specific Keys  --"
+$AppsKey = Test-Path -Path $outputlocation\office-apps-cleared.txt
 If($AppsKey -eq $False) { 
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing App Specific Registry Keys"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
 	Try {
         $ErrorActionPreference = 'stop'
         $Apps = "Access;Excel;PowerPoint;Publisher;Word;OneNote"
         $Apps -split ";" | foreach{
-	        Write-Host "-- -- Processing $_ -- --"
+	        #write-host "-- -- Processing $_ -- --"
 	        $CurAppKey = Get-Item Registry::"HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\"$_ -ErrorAction SilentlyContinue
 	        $FMRU = Get-Item Registry::$CurAppKey\'File MRU' -ErrorAction SilentlyContinue
 	        $UMRU = Get-Item Registry::$CurAppKey\'User MRU' -ErrorAction SilentlyContinue
@@ -836,33 +839,33 @@ If($AppsKey -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: App Specific Registry Keys"
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-apps-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-apps-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }	
 
 #Clear  Files Associated with Cached  User  data inside LocalAppData
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Clearing LocalAppData"
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
 
 #Most of these folders will be completely emptied, a few will have a single sub folder left behind.
-$FoldersTest = Test-Path -Path C:\Migration\office-folders-cleared.txt
+$FoldersTest = Test-Path -Path $outputlocation\office-folders-cleared.txt
 If($FoldersTest -eq $False) { 
     $OfficeDataDir = "$env:LOCALAPPDATA\Microsoft\Office\16.0"
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Clearing Office Folders: " + $OfficeDataDir
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
+    #write-host $output
+    $output | out-file -append $loglocation
     
 	Try {
         $ErrorActionPreference = 'stop'
@@ -884,16 +887,16 @@ If($FoldersTest -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed: Office Folders " + $OfficeDataDir
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\office-folders-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\office-folders-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
@@ -901,9 +904,9 @@ if($RmOneNoteFiles.IsPresent)
 {
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " ***STARTING: Deleting OneNote Local Folder"
-    Write-Host $output
-    $output | out-file -append "C:\migration\_log.txt"
-    $OneNoteLocal = Test-Path -Path C:\Migration\onenote-local-cleared.txt
+    #write-host $output
+    $output | out-file -append $loglocation
+    $OneNoteLocal = Test-Path -Path $outputlocation\onenote-local-cleared.txt
     If($OneNoteLocal -eq $False) { 
         Try {
             $ErrorActionPreference = 'stop'
@@ -913,26 +916,26 @@ if($RmOneNoteFiles.IsPresent)
             # If no errors, log success
 	        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $output = $timestamp + " Removed: " + $ONFolder
-            Write-Host $output
-	        $output | out-file -append "C:\migration\_log.txt"
-            New-Item C:\Migration\onenote-local-cleared.txt
+            #write-host $output
+	        $output | out-file -append $loglocation
+            New-Item $outputlocation\onenote-local-cleared.txt
         }
         Catch {
             # If there is an error, log the error
             $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	        $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	        Write-Warning $errormessage
-	        $errormessage | out-file -append "C:\migration\_log.txt"
+	        #write-warning $errormessage
+	        $errormessage | out-file -append $loglocation
         }
     }
 }
 
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Clearing AppData Roaming"
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
 
-$OfficeData = Test-Path -Path C:\Migration\officedata-recent-cleared.txt
+$OfficeData = Test-Path -Path $outputlocation\officedata-recent-cleared.txt
 If($OfficeData -eq $False) { 
     Try {
         $ErrorActionPreference = 'stop'
@@ -941,23 +944,23 @@ If($OfficeData -eq $False) {
         # If no errors, log success
 	    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Removed recent folder: " + $OfficeDataDir
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item C:\Migration\officedata-recent-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item $outputlocation\officedata-recent-cleared.txt
     }
     Catch {
         # If there is an error, log the error
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Clearing Windows Credentials"
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
 
 $Credentials = (cmdkey /list | Where-Object {$_ -like "*Target=MicrosoftOffice16_Data*"})
 Foreach ($Target in $Credentials) {
@@ -973,7 +976,7 @@ Foreach ($Target in $Credentials) {
     $Argument = "/delete:" + $Target
     Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
     }
-Write-Host "****** Clearing SSO_POP_Device Credentials : Complete ******"
+#write-host "****** Clearing SSO_POP_Device Credentials : Complete ******"
 
 $Credentials = (cmdkey /list | Where-Object {$_ -like "*virtualapp/didlogical*"})
 Foreach ($Target in $Credentials) {
@@ -981,7 +984,7 @@ Foreach ($Target in $Credentials) {
     $Argument = "/delete:" + $Target
     Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
     }
-Write-Host "****** Clearing virtualapp/didlogical Credentials : Complete ******"
+#write-host "****** Clearing virtualapp/didlogical Credentials : Complete ******"
 
 $Credentials = (cmdkey /list | Where-Object {$_ -like "*msteams*"})
 Foreach ($Target in $Credentials) {
@@ -989,16 +992,16 @@ Foreach ($Target in $Credentials) {
     $Argument = "/delete:" + $Target
     Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
     }
-Write-Host "****** Clearing Teams Credentials : Complete ******"
+#write-host "****** Clearing Teams Credentials : Complete ******"
 
 # Try to remove the Link School/Work account if there was one. It can be created if the first time you sign in, the user all
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Removal of 'Link School/Work account"
-Write-Host $output
-$output | out-file -append "C:\migration\_log.txt"
+#write-host $output
+$output | out-file -append $loglocation
 
 # Check if School/Work account was already removed by script
-$SchoolWorkAccount = Test-Path -Path C:\Migration\school-work-account-cleared.txt
+$SchoolWorkAccount = Test-Path -Path $outputlocation\school-work-account-cleared.txt
 If ($SchoolWorkAccount -eq $false){
     # Delete folders to remove School/Work account link
     $LocalPackagesFolder ="$env:LOCALAPPDATA\Packages"
@@ -1010,23 +1013,24 @@ If ($SchoolWorkAccount -eq $false){
         # If no errors, log success
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Folder deleted: " + $AADBrokerFolder + "\AC\TokenBroker\Accounts"
-        Write-Host $output
-	    $output | out-file -append "C:\migration\_log.txt"
-        New-Item -Path C:\Migration\school-work-account-cleared.txt
+        #write-host $output
+	    $output | out-file -append $loglocation
+        New-Item -Path $outputlocation\school-work-account-cleared.txt
     }
     # If there was an error, log the error
     Catch {
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $errormessage=$timestamp + " ERROR: " + $_.ToString()
-	    Write-Warning $errormessage
-	    $errormessage | out-file -append "C:\migration\_log.txt"
+	    #write-warning $errormessage
+	    $errormessage | out-file -append $loglocation
     }
 }
 
-$stopwatch.Elapsed.TotalSeconds
+$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+$output = $timestamp + " Script took : " + $stopwatch.Elapsed.TotalSeconds + " seconds"
+$output | out-file -append $loglocation
 
 $wshell = New-Object -ComObject Wscript.Shell
 $wshell.Popup("Migration complete, please open Outlook, Teams, and OneDrive and sign in")
 
-Read-Host -Prompt "Press any key to continue"
-
+#Read-Host -Prompt "Press any key to continue"
