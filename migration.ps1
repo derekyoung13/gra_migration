@@ -34,7 +34,7 @@ $OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
 
 If ($TeamsProcess) {
     # If 'Teams' process is running, stop it else do nothing
-    $TeamsProcess | Stop-Process -Force
+    $TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep 3
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Teams process was running, so we stopped it"
@@ -44,7 +44,7 @@ If ($TeamsProcess) {
 
 If ($OutlookProcess) {
     # If 'Outlook' process is running, stop it else do nothing
-    $OutlookProcess | Stop-Process -Force | Wait-Process
+    $OutlookProcess | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Outlook process was running, so we stopped it"
     #write-host $output
@@ -239,7 +239,7 @@ Else {
     # Get Outlook process. Only using 'SilentlyContinue' as we test this below
     $OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
     If ($OutlookProcess) {
-        $OutlookProcess | Stop-Process -Force  | Wait-Process
+        $OutlookProcess | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Outlook process was running, so we stopped it"
         #write-host $output
@@ -276,7 +276,7 @@ Else {
     # Get Outlook process. Only using 'SilentlyContinue' as we test this below
     $OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
     If ($OutlookProcess) {
-        $OutlookProcess | Stop-Process -Force | Wait-Process
+        $OutlookProcess | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
         #write-host "Outlook process was running, so we stopped it" -ForegroundColor Green
     }
     Try {
@@ -338,7 +338,7 @@ If ($OneDriveCache -eq $false){
 $OneDriveUnlinked1 = Test-Path -Path $outputlocation\onedrive-unlinked-1.txt
 If ($OneDriveUnlinked1 -eq $false){
     # If OneDrive is open, close it
-    $OneDriveProcess = Get-Process onedrive -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
+    $OneDriveProcess = Get-Process onedrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
     # Delete regkeys to unlink OneDrive account
     Try {
         $ErrorActionPreference = 'stop'
@@ -368,7 +368,7 @@ Else {
 $OneDriveUnlinked2 = Test-Path -Path $outputlocation\onedrive-unlinked-2.txt
 If ($OneDriveUnlinked2 -eq $false){
     # If OneDrive is open, close it
-    $OneDriveProcess = Get-Process onedrive -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
+    $OneDriveProcess = Get-Process onedrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
     # Delete regkeys to unlink OneDrive account
     Try {
         $ErrorActionPreference = 'stop'
@@ -400,7 +400,7 @@ Else {
 $TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
 If ($TeamsProcess) {
     # If 'Teams' process is running, stop it else do nothing
-    $TeamsProcess | Stop-Process -Force
+    $TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep 3
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Teams process was running, so we stopped it"
@@ -408,14 +408,14 @@ If ($TeamsProcess) {
 	$output | out-file -append $loglocation
 }
 Start-Sleep 3
-Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
-Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
-Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
-Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
-Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
-Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
-Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
-Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force | Wait-Process
+Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING: Clearing Office Activation sign in"
