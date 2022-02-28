@@ -307,9 +307,9 @@ $output | out-file -append $loglocation
 $OneDriveCache = Test-Path -Path $outputlocation\onedrive-cached-creds-cleared.txt
 If ($OneDriveCache -eq $false){
     Try {
-		Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
-        Install-Module -Name pscredentialmanager -Scope CurrentUser -force
-		Install-Module -Name CredentialManager -Scope CurrentUser -force
+		$null = Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
+        $null = Install-Module -Name pscredentialmanager -Scope CurrentUser -force
+		$null = Install-Module -Name CredentialManager -Scope CurrentUser -force
 		$onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
 		If($onedrive -ne $null) {
 			remove-storedcredential -target $onedrive.name
@@ -1009,7 +1009,7 @@ Foreach ($Target in $Credentials) {
 
 # Try to remove the Link School/Work account if there was one. It can be created if the first time you sign in, the user all
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING (Step 6/7): Removal of 'Link School/Work account"
+$output = $timestamp + " ***STARTING (Step 7/7): Removal of 'Link School/Work account"
 write-host $output
 $output | out-file -append $loglocation
 
