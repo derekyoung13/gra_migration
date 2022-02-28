@@ -5,7 +5,7 @@ $Migrationfolder = Test-Path $env:USERPROFILE"\migration"
 If($Migrationfolder -eq $False) {
     Try {
         $ErrorActionPreference = 'stop'
-        New-Item -Path $env:USERPROFILE -Name "Migration" -ItemType "directory"
+        $null = New-Item -Path $env:USERPROFILE -Name "Migration" -ItemType "directory"
     }
     Catch {
         # If there is an error, log the error
@@ -22,8 +22,8 @@ $outputlocation = $env:USERPROFILE + "\migration"
 # Begin Teams sign out
 " " | out-file -append $loglocation
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: Teams sign out"
-#write-host $output
+$output = $timestamp + " ***STARTING (Step 1/7): Teams sign out"
+write-host $output
 $output | out-file -append $loglocation
 
 # Get MS Teams process. Only using 'SilentlyContinue' as we test this below
@@ -96,20 +96,20 @@ If ($TeamsCache -eq $false){
             If( $storage -eq $True) {
                 Get-ChildItem -Path $env:APPDATA\"Microsoft\teams\storage.json" | Remove-Item
             }
-		    # If no errors renaming folder, log success
-	        $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	        $output = $timestamp + " Teams cache was cleared and user was signed out"
-        	#write-host $output
-	        $output | out-file -append $loglocation
-        	New-Item $outputlocation\teams-cache-cleared.txt
+			# If no errors renaming folder, log success
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Teams cache was cleared and user was signed out"
+			#write-host $output
+			$output | out-file -append $loglocation
+			$null = New-Item $outputlocation\teams-cache-cleared.txt
         }
         Catch {
-		# If there is an error, log the error
-		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$errormessage=$timestamp + " ERROR: " + $_.ToString()
-		#write-host $error[0].Exception.GetType().FullName
-		#write-host $errormessage -ForegroundColor Red
-		$errormessage | out-file -append $loglocation
+			# If there is an error, log the error
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$errormessage=$timestamp + " ERROR: " + $_.ToString()
+			#write-host $error[0].Exception.GetType().FullName
+			#write-host $errormessage -ForegroundColor Red
+			$errormessage | out-file -append $loglocation
         }
     }
     Else {
@@ -123,7 +123,7 @@ If ($TeamsCache -eq $false){
 Else {
     # If 'Teams' folder was already renamed then skip
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-    $output = $timestamp + " SKIPPING: Teams folder was already renamed "
+    $output = $timestamp + " SKIPPING: Teams cache was already cleared"
     #write-host $output
     $output | out-file -append $loglocation
 }
@@ -139,15 +139,15 @@ If ($TeamsUserClear -eq $false){
 	    $output = $timestamp + " Registry entry deleted: HKCU:\Software\Microsoft\Office\Teams\HomeUserUpn"
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\teams-homeuserupn-cleared.txt
+        $null = New-Item $outputlocation\teams-homeuserupn-cleared.txt
     }
     Catch {
-	# If there is an error, log the error
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	$errormessage=$timestamp + " ERROR: " + $_.ToString()
-	#write-host $error[0].Exception.GetType().FullName
-	#write-host $errormessage -ForegroundColor Red
-	$errormessage | out-file -append $loglocation
+		# If there is an error, log the error
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$errormessage=$timestamp + " ERROR: " + $_.ToString()
+		#write-host $error[0].Exception.GetType().FullName
+		#write-host $errormessage -ForegroundColor Red
+		$errormessage | out-file -append $loglocation
     }
 }
 # If HomeUserUpn was cleared before then skip
@@ -162,53 +162,53 @@ Else {
 $TeamsModifyDesktopConfig = Test-Path -Path $outputlocation\teams-modify-desktop-config.txt
 If($TeamsModifyDesktopConfig -eq $false) {
     Try { 
-	# Import desktop-Config.json
-	$ErrorActionPreference = 'stop'
-	$TeamsFolder = "$env:APPDATA\Microsoft\Teams"
-	$SourceDesktopConfigFile = "$TeamsFolder\desktop-config.json"
-	$desktopConfig = (Get-Content -Path $SourceDesktopConfigFile | ConvertFrom-Json)
-	# If no errors importing desktop-config, log success
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	$output = $timestamp + " " + $TeamsFolder + "\desktop-Config/json imported successfuly"
-	#write-host $output
-	$output | out-file -append $loglocation
-	# Modify desktop-Config.json
-	if($desktopConfig.isLoggedOut -ne $null) {
-		$desktopConfig.isLoggedOut = $true
-	}
-	if($desktopConfig.upnWindowUserUpn -ne $null) {
-		$desktopConfig.upnWindowUserUpn =""; #The email used to sign in
-	}
-	if($desktopConfig.userUpn -ne $null) {
-		$desktopConfig.userUpn ="";
-	}
-	if($desktopConfig.userOid -ne $null) {
-		$desktopConfig.userOid ="";
-	}
-	if($desktopConfig.userTid -ne $null) {
-		$desktopConfig.userTid = "";
-	}
-	if($desktopConfig.homeTenantId -ne $null) {
-		$desktopConfig.homeTenantId ="";
-	}
-	if($desktopConfig.webAccountId -ne $null) {
-		$desktopConfig.webAccountId="";
-	}
-	$desktopConfig | ConvertTo-Json -Compress | Set-Content -Path $SourceDesktopConfigFile -Force
-	# If no errors modifying desktop-config, log success
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	$output = $timestamp + " " + $TeamsFolder + "\desktop-Config/json modified successfuly"
-	#write-host $output
-	$output | out-file -append $loglocation
-	New-Item $outputlocation\teams-modify-desktop-config.txt
+		# Import desktop-Config.json
+		$ErrorActionPreference = 'stop'
+		$TeamsFolder = "$env:APPDATA\Microsoft\Teams"
+		$SourceDesktopConfigFile = "$TeamsFolder\desktop-config.json"
+		$desktopConfig = (Get-Content -Path $SourceDesktopConfigFile | ConvertFrom-Json)
+		# If no errors importing desktop-config, log success
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " " + $TeamsFolder + "\desktop-Config/json imported successfuly"
+		#write-host $output
+		$output | out-file -append $loglocation
+		# Modify desktop-Config.json
+		if($desktopConfig.isLoggedOut -ne $null) {
+			$desktopConfig.isLoggedOut = $true
+		}
+		if($desktopConfig.upnWindowUserUpn -ne $null) {
+			$desktopConfig.upnWindowUserUpn =""; #The email used to sign in
+		}
+		if($desktopConfig.userUpn -ne $null) {
+			$desktopConfig.userUpn ="";
+		}
+		if($desktopConfig.userOid -ne $null) {
+			$desktopConfig.userOid ="";
+		}
+		if($desktopConfig.userTid -ne $null) {
+			$desktopConfig.userTid = "";
+		}
+		if($desktopConfig.homeTenantId -ne $null) {
+			$desktopConfig.homeTenantId ="";
+		}
+		if($desktopConfig.webAccountId -ne $null) {
+			$desktopConfig.webAccountId="";
+		}
+		$desktopConfig | ConvertTo-Json -Compress | Set-Content -Path $SourceDesktopConfigFile -Force
+		# If no errors modifying desktop-config, log success
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " " + $TeamsFolder + "\desktop-Config/json modified successfuly"
+		#write-host $output
+		$output | out-file -append $loglocation
+		$null = New-Item $outputlocation\teams-modify-desktop-config.txt
     }
     Catch {
-	# If there is an error, log the error
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	$errormessage=$timestamp + " ERROR: " + $_.ToString()
-	#write-host $error[0].Exception.GetType().FullName
-	#write-host $errormessage -ForegroundColor Red
-	$errormessage | out-file -append $loglocation
+		# If there is an error, log the error
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$errormessage=$timestamp + " ERROR: " + $_.ToString()
+		#write-host $error[0].Exception.GetType().FullName
+		#write-host $errormessage -ForegroundColor Red
+		$errormessage | out-file -append $loglocation
     }
 }
 # If script desktop-Config.json was already modified then skip
@@ -221,8 +221,8 @@ Else {
 
 # Begin Outlook new profile creation
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: New profile creation for Outlook "
-#write-host $output
+$output = $timestamp + " ***STARTING (Step 2/7): New profile creation for Outlook"
+write-host $output
 $output | out-file -append $loglocation
 # Check if new profile was created
 $NewOutlookProfile = Test-Path -Path HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New
@@ -248,7 +248,7 @@ Else {
     Try {
         # Create new Outlook profile named 'Outlook-New'
         $ErrorActionPreference = 'stop'
-        New-Item -Path HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New
+        $null = New-Item -Path HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New
         # If no errors creating the new profile, log success
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " RegKey created: HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New"
@@ -282,7 +282,7 @@ Else {
     Try {
         # Set default Outlook profile to 'Outlook-New'
         $ErrorActionPreference = 'stop'
-        New-ItemProperty -Path HKCU:\Software\Microsoft\Office\16.0\Outlook -Name DefaultProfile -PropertyType String -Value "Outlook-New" -Force
+        $null = New-ItemProperty -Path HKCU:\Software\Microsoft\Office\16.0\Outlook -Name DefaultProfile -PropertyType String -Value "Outlook-New" -Force
         # If no errors setting the default Outlook profile, log success
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 	    $output = $timestamp + " Reg string created: 'HKCU:\Software\Microsoft\Office\16.0\Outlook\DefaultProfile' with value 'Outlook-New'"
@@ -300,8 +300,8 @@ Else {
 
 # Begin OneDrive sign out and unlink
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: OneDrive sign out and unlink"
-#write-host $output
+$output = $timestamp + " ***STARTING (Step 3/7): OneDrive sign out and unlink"
+write-host $output
 $output | out-file -append $loglocation
 # Clear OneDrive credentials unless script has been run previously
 $OneDriveCache = Test-Path -Path $outputlocation\onedrive-cached-creds-cleared.txt
@@ -317,7 +317,7 @@ If ($OneDriveCache -eq $false){
 			$output = $timestamp + " Cleared Cached OneDrive Credentials"
 			#write-host $output
 			$output | out-file -append $loglocation
-			New-Item -Path $outputlocation\onedrive-cached-creds-cleared.txt
+			$null = New-Item -Path $outputlocation\onedrive-cached-creds-cleared.txt
 		}
 		Else {
 			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
@@ -348,7 +348,7 @@ If ($OneDriveUnlinked1 -eq $false){
 	    $output = $timestamp + " Registry cleared: HKCU:\Software\Microsoft\OneDrive\Accounts\*"
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item -Path $outputlocation\onedrive-unlinked-1.txt
+        $null = New-Item -Path $outputlocation\onedrive-unlinked-1.txt
     }
     # If there was an error, log the error
     Catch {
@@ -378,7 +378,7 @@ If ($OneDriveUnlinked2 -eq $false){
 		$output = $timestamp + " Registry cleared: HKCU:\software\microsoft\windows\currentversion\explorer\desktop\namespace\*"
         #write-host $output
 		$output | out-file -append $loglocation
-        New-Item -Path $outputlocation\onedrive-unlinked-2.txt
+        $null = New-Item -Path $outputlocation\onedrive-unlinked-2.txt
     }
     # If there was an error, log the error
     Catch {
@@ -418,8 +418,8 @@ Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -F
 Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: Clearing Office Activation sign in"
-#write-host $output
+$output = $timestamp + " ***STARTING (Step 4/7): Clearing Office Activation sign in"
+write-host $output
 $output | out-file -append $loglocation
 
 $OfficeCommon = Get-Item Registry::HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common -ErrorAction SilentlyContinue
@@ -486,7 +486,7 @@ else {
 	}
 	else {
 		# there wasnt one here before, so we create a new registry value and put our SignedOutWAMUsers in it.
-		New-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $SignedOutWAMUsers -ErrorAction SilentlyContinue
+		$null = New-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $SignedOutWAMUsers -ErrorAction SilentlyContinue
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 		$output = $timestamp + " No Prior WAM, Creating new Value From Generated SignOutWAMUsers"
 		#write-host $output
@@ -508,7 +508,7 @@ else {
 	        $output = $timestamp + " Removed: " + $IdentityKey + "\Identities"
             #write-host $output
 	        $output | out-file -append $loglocation
-            New-Item $outputlocation\office-identities-cleared.txt
+            $null = New-Item $outputlocation\office-identities-cleared.txt
         }
         Catch {
             # If there is an error, log the error
@@ -533,7 +533,7 @@ else {
 	        $output = $timestamp + " Removed: " + $IdentityKey + "\Profiles"
             #write-host $output
 	        $output | out-file -append $loglocation
-            New-Item $outputlocation\office-profiles-cleared.txt
+            $null = New-Item $outputlocation\office-profiles-cleared.txt
         }
         Catch {
             # If there is an error, log the error
@@ -561,7 +561,7 @@ else {
 	        $output = $timestamp + " Removed: " + $IdentityKey + "\DocToIdMapping\*"
             #write-host $output
 	        $output | out-file -append $loglocation
-            New-Item $outputlocation\office-DocToIdMapping-cleared.txt
+            $null = New-Item $outputlocation\office-DocToIdMapping-cleared.txt
         }
         Catch {
             # If there is an error, log the error
@@ -588,7 +588,7 @@ If($CloudPolicyKey -eq $False) {
 	    $output = $timestamp + " Removed: " + $CloudPolicy
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-cloudpolicy-cleared.txt
+        $null = New-Item $outputlocation\office-cloudpolicy-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -614,7 +614,7 @@ If($LicensingNextKey -eq $False) {
 	    $output = $timestamp + " Removed: " + $LicensingNext
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-licensingnext-cleared.txt
+        $null = New-Item $outputlocation\office-licensingnext-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -640,7 +640,7 @@ If($TemplatesKey -eq $False) {
 	    $output = $timestamp + " Removed: " + $WebTemplates
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-templates-cleared.txt
+        $null = New-Item $outputlocation\office-templates-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -666,7 +666,7 @@ If($SettingsStoreKey -eq $False) {
 	    $output = $timestamp + " Removed: " + $SettingsStore
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-settingsstore-cleared.txt
+        $null = New-Item $outputlocation\office-settingsstore-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -692,7 +692,7 @@ If($RoamIdKey -eq $False) {
 	    $output = $timestamp + " Removed: " + $RoamId
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-roamid-cleared.txt
+        $null = New-Item $outputlocation\office-roamid-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -722,7 +722,7 @@ If($SerManCacheKey -eq $False) {
 	    $output = $timestamp + " Removed: " + $SerManCache + "\Identities and \OnPremises"
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-sermancache-cleared.txt
+        $null = New-Item $outputlocation\office-sermancache-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -753,7 +753,7 @@ If($TargetedMsgServKey -eq $False) {
 	    $output = $timestamp + " Removed: " + $TargetedMsgServ + "\MessageData and \MessageMetaData"
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-targetedmsgserv-cleared.txt
+        $null = New-Item $outputlocation\office-targetedmsgserv-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -779,7 +779,7 @@ If($UrlRepkey -eq $False) {
 	    $output = $timestamp + " Removed: " + $UrlRep
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-urlrep-cleared.txt
+        $null = New-Item $outputlocation\office-urlrep-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -841,7 +841,7 @@ If($AppsKey -eq $False) {
 	    $output = $timestamp + " Removed: App Specific Registry Keys"
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-apps-cleared.txt
+        $null = New-Item $outputlocation\office-apps-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -854,8 +854,8 @@ If($AppsKey -eq $False) {
 
 #Clear  Files Associated with Cached  User  data inside LocalAppData
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: Clearing LocalAppData"
-#write-host $output
+$output = $timestamp + " ***STARTING (Step 5/7): Clearing LocalAppData"
+write-host $output
 $output | out-file -append $loglocation
 
 #Most of these folders will be completely emptied, a few will have a single sub folder left behind.
@@ -889,7 +889,7 @@ If($FoldersTest -eq $False) {
 	    $output = $timestamp + " Removed: Office Folders " + $OfficeDataDir
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\office-folders-cleared.txt
+        $null = New-Item $outputlocation\office-folders-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -903,7 +903,7 @@ If($FoldersTest -eq $False) {
 if($RmOneNoteFiles.IsPresent)
 {
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-    $output = $timestamp + " ***STARTING: Deleting OneNote Local Folder"
+    $output = $timestamp + " Deleting OneNote Local Folder"
     #write-host $output
     $output | out-file -append $loglocation
     $OneNoteLocal = Test-Path -Path $outputlocation\onenote-local-cleared.txt
@@ -918,7 +918,7 @@ if($RmOneNoteFiles.IsPresent)
 	        $output = $timestamp + " Removed: " + $ONFolder
             #write-host $output
 	        $output | out-file -append $loglocation
-            New-Item $outputlocation\onenote-local-cleared.txt
+            $null = New-Item $outputlocation\onenote-local-cleared.txt
         }
         Catch {
             # If there is an error, log the error
@@ -931,7 +931,7 @@ if($RmOneNoteFiles.IsPresent)
 }
 
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: Clearing AppData Roaming"
+$output = $timestamp + " Clearing AppData Roaming"
 #write-host $output
 $output | out-file -append $loglocation
 
@@ -946,7 +946,7 @@ If($OfficeData -eq $False) {
 	    $output = $timestamp + " Removed recent folder: " + $OfficeDataDir
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item $outputlocation\officedata-recent-cleared.txt
+        $null = New-Item $outputlocation\officedata-recent-cleared.txt
     }
     Catch {
         # If there is an error, log the error
@@ -958,8 +958,8 @@ If($OfficeData -eq $False) {
 }
 # Clear saved credentials
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: Clearing Windows Credentials"
-#write-host $output
+$output = $timestamp + " ***STARTING (Step 6/7): Clearing Windows Credentials"
+write-host $output
 $output | out-file -append $loglocation
 
 $Credentials = (cmdkey /list | Where-Object {$_ -like "*Target=MicrosoftOffice16_Data*"})
@@ -1009,8 +1009,8 @@ Foreach ($Target in $Credentials) {
 
 # Try to remove the Link School/Work account if there was one. It can be created if the first time you sign in, the user all
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-$output = $timestamp + " ***STARTING: Removal of 'Link School/Work account"
-#write-host $output
+$output = $timestamp + " ***STARTING (Step 6/7): Removal of 'Link School/Work account"
+write-host $output
 $output | out-file -append $loglocation
 
 # Check if School/Work account was already removed by script
@@ -1028,7 +1028,7 @@ If ($SchoolWorkAccount -eq $false){
 	    $output = $timestamp + " Folder deleted: " + $AADBrokerFolder + "\AC\TokenBroker\Accounts"
         #write-host $output
 	    $output | out-file -append $loglocation
-        New-Item -Path $outputlocation\school-work-account-cleared.txt
+        $null = New-Item -Path $outputlocation\school-work-account-cleared.txt
     }
     # If there was an error, log the error
     Catch {
