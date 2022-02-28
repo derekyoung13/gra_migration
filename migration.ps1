@@ -307,9 +307,18 @@ $output | out-file -append $loglocation
 $OneDriveCache = Test-Path -Path $outputlocation\onedrive-cached-creds-cleared.txt
 If ($OneDriveCache -eq $false){
     Try {
-		$null = Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
-        $null = Install-Module -Name pscredentialmanager -Scope CurrentUser -force
-		$null = Install-Module -Name CredentialManager -Scope CurrentUser -force
+		$CheckNuget = Get-PackageProvider -listavailable nuget -ErrorAction SilentlyContinue
+		If($CheckNuget -eq $null ) {
+            $null = Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -scope currentuser -force
+        }
+        $CheckPsCred = Get-Module -listavailable pscredentialmanager -ErrorAction SilentlyContinue
+		If($CheckPsCred -eq $null ) {
+            $null = Install-Module -Name pscredentialmanager -Scope CurrentUser -force
+        }
+        $CheckCredMan = Get-Module -listavailable CredentialManager -ErrorAction SilentlyContinue
+		If($CheckCredMan -eq $null ) {
+            $null = Install-Module -Name CredentialManager -Scope CurrentUser -force
+        }
 		$onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
 		If($onedrive -ne $null) {
 			remove-storedcredential -target $onedrive.name
