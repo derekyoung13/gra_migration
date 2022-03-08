@@ -321,11 +321,13 @@ If ($OneDriveCache -eq $false){
         }
 		$onedrive = Get-CachedCredential | where {$_.name -like "*onedrive*"}
 		If($onedrive -ne $null) {
-			remove-storedcredential -target $onedrive.name
-			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-			$output = $timestamp + " Cleared Cached OneDrive Credentials"
-			#write-host $output
-			$output | out-file -append $loglocation
+			foreach($cred in $onedrive) {
+				remove-storedcredential -target $cred.name
+				$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+				$output = $timestamp + " Cleared Cached OneDrive Credentials"
+				#write-host $output
+				$output | out-file -append $loglocation
+			}
 			$null = New-Item -Path $outputlocation\onedrive-cached-creds-cleared.txt
 		}
 		Else {
