@@ -2,7 +2,7 @@ $action = New-ScheduledTaskAction -Execute “powershell.exe” -Argument "-exec
 $trigger = New-ScheduledTaskTrigger -Once -At "3/9/2022 10:00:00 AM"
 $principal = New-ScheduledTaskPrincipal -UserId (Get-CimInstance –ClassName Win32_ComputerSystem | Select-Object -expand UserName)
 $task = New-ScheduledTask -Action $action -Trigger $trigger -Principal $principal
-Register-ScheduledTask Notepad -InputObject $task
-Start-ScheduledTask -TaskName GRA_O365_Migration
-Start-Sleep -Seconds 5
-Unregister-ScheduledTask -TaskName GRA_O365_Migration -Confirm:$false
+Register-ScheduledTask GRA_O365_Migration -InputObject $task
+#Start-ScheduledTask -TaskName GRA_O365_Migration
+#Start-Sleep -Seconds 5
+#Unregister-ScheduledTask -TaskName GRA_O365_Migration -Confirm:$false
