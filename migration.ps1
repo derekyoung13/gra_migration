@@ -1080,6 +1080,10 @@ $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " Script took : " + $stopwatch.Elapsed.TotalSeconds + " seconds"
 $output | out-file -append $loglocation
 
+$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+$output = $timestamp + " Counter : " + $counter
+$output | out-file -append $loglocation
+
 $wshell = New-Object -ComObject Wscript.Shell
 $wshell.Popup("Migration complete, please open Outlook, Teams, and OneDrive and sign in")
 
