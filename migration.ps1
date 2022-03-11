@@ -1523,11 +1523,11 @@ $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " Counter : " + $counter
 $output | out-file -append $loglocation
 
-# If most tasks complete (18/26) then mark full script as complete
+# If most tasks complete (14/26) then mark full script as complete
 # If full script complete, skip
 $FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
 If ($FullScriptCheck -eq $false){
-	If($counter -gt 18) {
+	If($counter -gt 14) {
 		$null = New-Item -Path $outputlocation\full-script-complete.txt
 	}
 }
