@@ -1527,7 +1527,7 @@ $output | out-file -append $loglocation
 # If full script complete, skip
 $FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
 If ($FullScriptCheck -eq $false){
-	If($counter > 18) {
+	If($counter -gt 18) {
 		$null = New-Item -Path $outputlocation\full-script-complete.txt
 	}
 }
