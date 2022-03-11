@@ -1,5 +1,6 @@
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-
+# Add a counter to know when to skip
+$counter=0
 # Test the path $env:USERPROFILE + "\migration is there, create it if it doesn't exist
 $Migrationfolder = Test-Path $env:USERPROFILE"\migration"
 If($Migrationfolder -eq $False) {
@@ -102,6 +103,7 @@ If ($TeamsCache -eq $false){
 			#write-host $output
 			$output | out-file -append $loglocation
 			$null = New-Item $outputlocation\teams-cache-cleared.txt
+			$counter ++
         }
         Catch {
 			# If there is an error, log the error
@@ -140,6 +142,7 @@ If ($TeamsUserClear -eq $false){
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\teams-homeuserupn-cleared.txt
+		$counter ++
     }
     Catch {
 		# If there is an error, log the error
@@ -201,6 +204,7 @@ If($TeamsModifyDesktopConfig -eq $false) {
 		#write-host $output
 		$output | out-file -append $loglocation
 		$null = New-Item $outputlocation\teams-modify-desktop-config.txt
+		$counter ++
     }
     Catch {
 		# If there is an error, log the error
@@ -254,6 +258,7 @@ Else {
 		$output = $timestamp + " RegKey created: HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New"
 		#write-host $output
 		$output | out-file -append $loglocation
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -288,6 +293,7 @@ Else {
 	    $output = $timestamp + " Reg string created: 'HKCU:\Software\Microsoft\Office\16.0\Outlook\DefaultProfile' with value 'Outlook-New'"
         #write-host $output
 	    $output | out-file -append $loglocation
+		$counter ++
     }
     # If there was an error, log the error
     Catch {
@@ -329,6 +335,8 @@ If ($OneDriveCache -eq $false){
 				$output | out-file -append $loglocation
 			}
 			$null = New-Item -Path $outputlocation\onedrive-cached-creds-cleared.txt
+			$counter ++
+			
 		}
 		Else {
 			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
@@ -360,6 +368,7 @@ If ($OneDriveUnlinked1 -eq $false){
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item -Path $outputlocation\onedrive-unlinked-1.txt
+		$counter ++
     }
     # If there was an error, log the error
     Catch {
@@ -390,6 +399,7 @@ If ($OneDriveUnlinked2 -eq $false){
         #write-host $output
 		$output | out-file -append $loglocation
         $null = New-Item -Path $outputlocation\onedrive-unlinked-2.txt
+		$counter ++
     }
     # If there was an error, log the error
     Catch {
@@ -520,6 +530,7 @@ else {
             #write-host $output
 	        $output | out-file -append $loglocation
             $null = New-Item $outputlocation\office-identities-cleared.txt
+			$counter ++
         }
         Catch {
             # If there is an error, log the error
@@ -545,6 +556,7 @@ else {
             #write-host $output
 	        $output | out-file -append $loglocation
             $null = New-Item $outputlocation\office-profiles-cleared.txt
+			$counter ++
         }
         Catch {
             # If there is an error, log the error
@@ -573,6 +585,7 @@ else {
             #write-host $output
 	        $output | out-file -append $loglocation
             $null = New-Item $outputlocation\office-DocToIdMapping-cleared.txt
+			$counter ++
         }
         Catch {
             # If there is an error, log the error
@@ -600,6 +613,7 @@ If($CloudPolicyKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-cloudpolicy-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -626,6 +640,7 @@ If($LicensingNextKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-licensingnext-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -652,6 +667,7 @@ If($TemplatesKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-templates-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -678,6 +694,7 @@ If($SettingsStoreKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-settingsstore-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -704,6 +721,7 @@ If($RoamIdKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-roamid-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -734,6 +752,7 @@ If($SerManCacheKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-sermancache-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -765,6 +784,7 @@ If($TargetedMsgServKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-targetedmsgserv-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -791,6 +811,7 @@ If($UrlRepkey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-urlrep-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -853,6 +874,7 @@ If($AppsKey -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-apps-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -901,6 +923,7 @@ If($FoldersTest -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\office-folders-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -930,6 +953,7 @@ if($RmOneNoteFiles.IsPresent)
             #write-host $output
 	        $output | out-file -append $loglocation
             $null = New-Item $outputlocation\onenote-local-cleared.txt
+			$counter ++
         }
         Catch {
             # If there is an error, log the error
@@ -958,6 +982,7 @@ If($OfficeData -eq $False) {
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item $outputlocation\officedata-recent-cleared.txt
+		$counter ++
     }
     Catch {
         # If there is an error, log the error
@@ -1040,6 +1065,7 @@ If ($SchoolWorkAccount -eq $false){
         #write-host $output
 	    $output | out-file -append $loglocation
         $null = New-Item -Path $outputlocation\school-work-account-cleared.txt
+		$counter ++
     }
     # If there was an error, log the error
     Catch {
