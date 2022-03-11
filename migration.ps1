@@ -24,7 +24,11 @@ $outputlocation = $env:USERPROFILE + "\migration"
 " " | out-file -append $loglocation
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 1/7): Teams sign out"
-write-host $output
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	write-host $output
+}
 $output | out-file -append $loglocation
 
 # Clear Teams cached folders under %appdata%\Microsoft\Teams
@@ -273,7 +277,11 @@ Else {
 # Begin Outlook new profile creation
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 2/7): New profile creation for Outlook"
-write-host $output
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	write-host $output
+}
 $output | out-file -append $loglocation
 # Check if new profile was created
 $NewOutlookProfile = Test-Path -Path HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles\Outlook-New
@@ -354,7 +362,11 @@ Else {
 # Begin OneDrive sign out and unlink
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 3/7): OneDrive sign out and unlink"
-write-host $output
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	write-host $output
+}
 $output | out-file -append $loglocation
 # Clear OneDrive credentials unless script has been run previously
 $OneDriveCache = Test-Path -Path $outputlocation\onedrive-cached-creds-cleared.txt
@@ -468,7 +480,11 @@ Else {
 # Begin Office Activation logout
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 4/7): Clearing Office Activation sign in"
-write-host $output
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	write-host $output
+}
 $output | out-file -append $loglocation
 
 $OfficeCommon = Get-Item Registry::HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common -ErrorAction SilentlyContinue
@@ -1210,7 +1226,11 @@ If($AppsKey -eq $False) {
 #Clear  Files Associated with Cached  User  data inside LocalAppData
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 5/7): Clearing LocalAppData"
-write-host $output
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	write-host $output
+}
 $output | out-file -append $loglocation
 
 #Most of these folders will be completely emptied, a few will have a single sub folder left behind.
@@ -1380,7 +1400,11 @@ If($OfficeData -eq $False) {
 # Clear saved credentials
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 6/7): Clearing Windows Credentials"
-write-host $output
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	write-host $output
+}
 $output | out-file -append $loglocation
 
 $cachedcreds =  Test-Path -Path $outputlocation\cached-creds-cleared.txt
@@ -1457,7 +1481,11 @@ If($cachedcreds -eq $False) {
 # Try to remove the Link School/Work account if there was one. It can be created if the first time you sign in, the user all
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 7/7): Removal of 'Link School/Work account"
-write-host $output
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	write-host $output
+}
 $output | out-file -append $loglocation
 
 # Check if School/Work account was already removed by script
@@ -1495,7 +1523,20 @@ $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " Counter : " + $counter
 $output | out-file -append $loglocation
 
-$wshell = New-Object -ComObject Wscript.Shell
-$wshell.Popup("Migration complete, please open Outlook, Teams, and OneDrive and sign in")
+# If most tasks complete (18/26) then mark full script as complete
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	If($counter > 18) {
+		$null = New-Item -Path $outputlocation\full-script-complete.txt
+	}
+}
+
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	$wshell = New-Object -ComObject Wscript.Shell
+	$wshell.Popup("Migration complete, please open Outlook, Teams, and OneDrive and sign in")
+}
 
 #Read-Host -Prompt "Press any key to continue"
