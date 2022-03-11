@@ -27,35 +27,34 @@ $output = $timestamp + " ***STARTING (Step 1/7): Teams sign out"
 write-host $output
 $output | out-file -append $loglocation
 
-# Get MS Teams process. Only using 'SilentlyContinue' as we test this below
-$TeamsProcess = Get-Process Teams -ErrorAction SilentlyContinue
-
-# Get Outlook process. Only using 'SilentlyContinue' as we test this below
-$OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
-
-If ($TeamsProcess) {
-    # If 'Teams' process is running, stop it else do nothing
-    $TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep 3
-    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-    $output = $timestamp + " Teams process was running, so we stopped it"
-    #write-host $output
-    $output | out-file -append $loglocation
-}
-
-If ($OutlookProcess) {
-    # If 'Outlook' process is running, stop it else do nothing
-    $OutlookProcess | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-    $output = $timestamp + " Outlook process was running, so we stopped it"
-    #write-host $output
-    $output | out-file -append $loglocation
-}
-
 # Clear Teams cached folders under %appdata%\Microsoft\Teams
 # Check if teams folder cache was already cleared by script
 $TeamsCache = Test-Path -Path $outputlocation\teams-cache-cleared.txt
 If ($TeamsCache -eq $false){
+	# Get MS Teams process. Only using 'SilentlyContinue' as we test this below
+	$TeamsProcess = Get-Process Teams -ErrorAction SilentlyContinue
+
+	# Get Outlook process. Only using 'SilentlyContinue' as we test this below
+	$OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
+
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+
+	If ($OutlookProcess) {
+		# If 'Outlook' process is running, stop it else do nothing
+		$OutlookProcess | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Outlook process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
     $TeamsFolderCheck = Test-Path -Path $env:APPDATA\"Microsoft\Teams"
     If ($TeamsFolderCheck -eq $true) {
         # Check if 'Teams' folder exists in %APPDATA%\Microsoft\Teams
@@ -133,6 +132,30 @@ Else {
 # Check if HomeUserUpn for teams was cleared by script
 $TeamsUserClear = Test-Path -Path $outputlocation\teams-homeuserupn-cleared.txt
 If ($TeamsUserClear -eq $false){
+	# Get MS Teams process. Only using 'SilentlyContinue' as we test this below
+	$TeamsProcess = Get-Process Teams -ErrorAction SilentlyContinue
+
+	# Get Outlook process. Only using 'SilentlyContinue' as we test this below
+	$OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
+
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+
+	If ($OutlookProcess) {
+		# If 'Outlook' process is running, stop it else do nothing
+		$OutlookProcess | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Outlook process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
     Try { 
         $ErrorActionPreference = 'stop'
         Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Office\Teams" -Name "HomeUserUpn"
@@ -164,6 +187,30 @@ Else {
 # Check if modify desktop-Config.json was already done by script
 $TeamsModifyDesktopConfig = Test-Path -Path $outputlocation\teams-modify-desktop-config.txt
 If($TeamsModifyDesktopConfig -eq $false) {
+	# Get MS Teams process. Only using 'SilentlyContinue' as we test this below
+	$TeamsProcess = Get-Process Teams -ErrorAction SilentlyContinue
+
+	# Get Outlook process. Only using 'SilentlyContinue' as we test this below
+	$OutlookProcess = Get-Process Outlook -ErrorAction SilentlyContinue
+
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+
+	If ($OutlookProcess) {
+		# If 'Outlook' process is running, stop it else do nothing
+		$OutlookProcess | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Outlook process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
     Try { 
 		# Import desktop-Config.json
 		$ErrorActionPreference = 'stop'
@@ -343,6 +390,8 @@ If ($OneDriveCache -eq $false){
 			$output = $timestamp + " No Cached OneDrive Credentials to clear"
 			#write-host $output
 			$output | out-file -append $loglocation
+			$null = New-Item -Path $outputlocation\onedrive-cached-creds-cleared.txt
+			$counter ++
 		}
     }
 	Catch {
@@ -417,27 +466,6 @@ Else {
 }
 
 # Begin Office Activation logout
-#We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
-$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
-If ($TeamsProcess) {
-    # If 'Teams' process is running, stop it else do nothing
-    $TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep 3
-    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-    $output = $timestamp + " Teams process was running, so we stopped it"
-    #write-host $output
-	$output | out-file -append $loglocation
-}
-Start-Sleep 3
-Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " ***STARTING (Step 4/7): Clearing Office Activation sign in"
 write-host $output
@@ -453,6 +481,27 @@ $UserIdentityKeys = Get-ChildItem Registry::$IdentityKey\Identities -ErrorAction
 
 $UserIdentityKeysCheck = Test-Path -Path Registry::$IdentityKey\Identities
 if($UserIdentityKeysCheck -eq $False) {
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $UserIdentityKeys = Get-ChildItem Registry::$IdentityKey\Identities -ErrorAction SilentlyContinue
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " No users logged into Office "
@@ -460,6 +509,27 @@ if($UserIdentityKeysCheck -eq $False) {
     $output | out-file -append $loglocation
 }
 else {
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
 	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " UserIdentityKeys: " + $UserIdentityKeys + "\Identities"
     #write-host $output
@@ -517,6 +587,27 @@ else {
     # Check if Identities Subkey was already deleted by script
     $IdentitiesKey = Test-Path -Path $outputlocation\office-identities-cleared.txt
     If($IdentitiesKey -eq $False) { 
+		# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+		$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+		If ($TeamsProcess) {
+			# If 'Teams' process is running, stop it else do nothing
+			$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+			Start-Sleep 3
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Teams process was running, so we stopped it"
+			#write-host $output
+			$output | out-file -append $loglocation
+		}
+		Start-Sleep 3
+		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Removing Identities Registry Key: " + $IdentityKey + "\Identities"
         #write-host $output
@@ -543,6 +634,27 @@ else {
     # Check if Profiles Subkey was already deleted by script
     $ProfileKey = Test-Path -Path $outputlocation\office-profiles-cleared.txt
     If($ProfileKey -eq $False) { 
+		# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+		$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+		If ($TeamsProcess) {
+			# If 'Teams' process is running, stop it else do nothing
+			$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+			Start-Sleep 3
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Teams process was running, so we stopped it"
+			#write-host $output
+			$output | out-file -append $loglocation
+		}
+		Start-Sleep 3
+		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Removing Profiles Registry Key: " + $IdentityKey + "\Profiles"
         #write-host $output
@@ -572,6 +684,27 @@ else {
     # Check if DocToIdMapping Subkey was already deleted by script
     $DocToIdMappingKey = Test-Path -Path $outputlocation\office-DocToIdMapping-cleared.txt
     If($DocToIdMappingKey -eq $False) { 
+		# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+		$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+		If ($TeamsProcess) {
+			# If 'Teams' process is running, stop it else do nothing
+			$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+			Start-Sleep 3
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Teams process was running, so we stopped it"
+			#write-host $output
+			$output | out-file -append $loglocation
+		}
+		Start-Sleep 3
+		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+
         $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
         $output = $timestamp + " Removing DocToIdMapping Registry Key: " + $IdentityKey + "\Profiles"
         #write-host $output
@@ -599,6 +732,27 @@ else {
 #Start Clearing out remanants that the user was logged in before#
 $CloudPolicyKey = Test-Path -Path $outputlocation\office-cloudpolicy-cleared.txt
 If($CloudPolicyKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing CloudPolicy Registry Key: " + $OfficeCommon + "\CloudPolicy"
     #write-host $output
@@ -626,6 +780,27 @@ If($CloudPolicyKey -eq $False) {
 
 $LicensingNextKey = Test-Path -Path $outputlocation\office-licensingnext-cleared.txt
 If($LicensingNextKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing LicensingNext Registry Key: " + $OfficeCommon + "\Licensing\LicensingNext"
     #write-host $output
@@ -653,6 +828,27 @@ If($LicensingNextKey -eq $False) {
 
 $TemplatesKey = Test-Path -Path $outputlocation\office-templates-cleared.txt
 If($TemplatesKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing Templates Registry Key: " + $OfficeCommon + "\OfficeStart\Web\Templates"
     #write-host $output
@@ -680,6 +876,27 @@ If($TemplatesKey -eq $False) {
 
 $SettingsStoreKey = Test-Path -Path $outputlocation\office-settingsstore-cleared.txt
 If($SettingsStoreKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing SettingsStore Registry Key: " + $OfficeCommon + "\Privacy\SettingsStore"
     #write-host $output
@@ -707,6 +924,27 @@ If($SettingsStoreKey -eq $False) {
 
 $RoamIdKey = Test-Path -Path $outputlocation\office-roamid-cleared.txt
 If($RoamIdKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing RoamId Registry Key: " + $OfficeCommon + "\Roaming\Identities"
     #write-host $output
@@ -734,6 +972,27 @@ If($RoamIdKey -eq $False) {
 
 $SerManCacheKey = Test-Path -Path $outputlocation\office-sermancache-cleared.txt
 If($SerManCacheKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing SerManCache Registry Key: " + $OfficeCommon + "\ServicesManagerCache\Identities and \ServicesManagerCache\OnPremises"
     #write-host $output
@@ -766,6 +1025,27 @@ If($SerManCacheKey -eq $False) {
 #write-host "-- Clearing TargetMessaging --"
 $TargetedMsgServKey = Test-Path -Path $outputlocation\office-targetedmsgserv-cleared.txt
 If($TargetedMsgServKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing TargetedMsgServ Registry Key: " + $OfficeCommon + "\TargetedMessagingService\MessageData and \TargetedMessagingService\MessageMetaData"
     #write-host $output
@@ -797,6 +1077,27 @@ If($TargetedMsgServKey -eq $False) {
 
 $UrlRepkey = Test-Path -Path $outputlocation\office-urlrep-cleared.txt
 If($UrlRepkey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing UrlRep Registry Key: " + $OfficeCommon + "\UrlReputation\UserPolicy"
     #write-host $output
@@ -827,6 +1128,27 @@ If($UrlRepkey -eq $False) {
 #write-host "-- Clearing App Specific Keys  --"
 $AppsKey = Test-Path -Path $outputlocation\office-apps-cleared.txt
 If($AppsKey -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Removing App Specific Registry Keys"
     #write-host $output
@@ -894,6 +1216,27 @@ $output | out-file -append $loglocation
 #Most of these folders will be completely emptied, a few will have a single sub folder left behind.
 $FoldersTest = Test-Path -Path $outputlocation\office-folders-cleared.txt
 If($FoldersTest -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     $OfficeDataDir = "$env:LOCALAPPDATA\Microsoft\Office\16.0"
     $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
     $output = $timestamp + " Clearing Office Folders: " + $OfficeDataDir
@@ -942,6 +1285,27 @@ if($RmOneNoteFiles.IsPresent)
     $output | out-file -append $loglocation
     $OneNoteLocal = Test-Path -Path $outputlocation\onenote-local-cleared.txt
     If($OneNoteLocal -eq $False) { 
+		# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+		$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+		If ($TeamsProcess) {
+			# If 'Teams' process is running, stop it else do nothing
+			$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+			Start-Sleep 3
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Teams process was running, so we stopped it"
+			#write-host $output
+			$output | out-file -append $loglocation
+		}
+		Start-Sleep 3
+		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+
         Try {
             $ErrorActionPreference = 'stop'
             $ONRegKey = Get-Item Registry::"HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\OneNote\Options\Save"
@@ -972,6 +1336,27 @@ $output | out-file -append $loglocation
 
 $OfficeData = Test-Path -Path $outputlocation\officedata-recent-cleared.txt
 If($OfficeData -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
     Try {
         $ErrorActionPreference = 'stop'
         $OfficeDataDir = "$env:APPDATA\Microsoft\Office\Recent"
@@ -998,50 +1383,76 @@ $output = $timestamp + " ***STARTING (Step 6/7): Clearing Windows Credentials"
 write-host $output
 $output | out-file -append $loglocation
 
-$Credentials = (cmdkey /list | Where-Object {$_ -like "*Target=MicrosoftOffice16_Data*"})
-Foreach ($Target in $Credentials) {
-    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
-    $Argument = "/delete:" + $Target
-    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
- }
+$cachedcreds =  Test-Path -Path $outputlocation\cached-creds-cleared.txt
+If($cachedcreds -eq $False) { 
+	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+	If ($TeamsProcess) {
+		# If 'Teams' process is running, stop it else do nothing
+		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+		Start-Sleep 3
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Teams process was running, so we stopped it"
+		#write-host $output
+		$output | out-file -append $loglocation
+	}
+	Start-Sleep 3
+	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+	
+	$Credentials = (cmdkey /list | Where-Object {$_ -like "*Target=MicrosoftOffice16_Data*"})
+	Foreach ($Target in $Credentials) {
+		$Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+		$Argument = "/delete:" + $Target
+		Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+	 }
 
-$Credentials = (cmdkey /list | Where-Object {$_ -like "*outlook.office365.com*"})
-Foreach ($Target in $Credentials) {
-    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
-    $Argument = "/delete:" + $Target
-    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+	$Credentials = (cmdkey /list | Where-Object {$_ -like "*outlook.office365.com*"})
+	Foreach ($Target in $Credentials) {
+		$Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+		$Argument = "/delete:" + $Target
+		Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+	}
+
+	$Credentials = (cmdkey /list | Where-Object {$_ -like "*SSO_POP_Device*"})
+	Foreach ($Target in $Credentials) {
+		$Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+		$Argument = "/delete:" + $Target
+		Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+	}
+	#write-host "****** Clearing SSO_POP_Device Credentials : Complete ******"
+
+	$Credentials = (cmdkey /list | Where-Object {$_ -like "*virtualapp/didlogical*"})
+	Foreach ($Target in $Credentials) {
+		$Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+		$Argument = "/delete:" + $Target
+		Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+	}
+	#write-host "****** Clearing virtualapp/didlogical Credentials : Complete ******"
+
+	$Credentials = (cmdkey /list | Where-Object {$_ -like "*msteams*"})
+	Foreach ($Target in $Credentials) {
+		$Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+		$Argument = "/delete:" + $Target
+		Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+	}
+	#write-host "****** Clearing Teams Credentials : Complete ******"
+
+	$Credentials = (cmdkey /list | Where-Object {$_ -like "*XboxLive*"})
+	Foreach ($Target in $Credentials) {
+		$Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
+		$Argument = "/delete:" + $Target
+		Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
+		}
+	$null = New-Item -Path $outputlocation\cached-creds-cleared.txt
+	$counter ++
 }
-
-$Credentials = (cmdkey /list | Where-Object {$_ -like "*SSO_POP_Device*"})
-Foreach ($Target in $Credentials) {
-    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
-    $Argument = "/delete:" + $Target
-    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-}
-#write-host "****** Clearing SSO_POP_Device Credentials : Complete ******"
-
-$Credentials = (cmdkey /list | Where-Object {$_ -like "*virtualapp/didlogical*"})
-Foreach ($Target in $Credentials) {
-    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
-    $Argument = "/delete:" + $Target
-    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-}
-#write-host "****** Clearing virtualapp/didlogical Credentials : Complete ******"
-
-$Credentials = (cmdkey /list | Where-Object {$_ -like "*msteams*"})
-Foreach ($Target in $Credentials) {
-    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
-    $Argument = "/delete:" + $Target
-    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-}
-#write-host "****** Clearing Teams Credentials : Complete ******"
-
-$Credentials = (cmdkey /list | Where-Object {$_ -like "*XboxLive*"})
-Foreach ($Target in $Credentials) {
-    $Target = ($Target -split (":", 2) | Select-Object -Skip 1).substring(1)
-    $Argument = "/delete:" + $Target
-    Start-Process Cmdkey -ArgumentList $Argument -NoNewWindow -RedirectStandardOutput $False
-    }
 
 # Try to remove the Link School/Work account if there was one. It can be created if the first time you sign in, the user all
 $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
