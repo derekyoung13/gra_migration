@@ -508,7 +508,6 @@ if($UserIdentityKeysCheck -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -536,7 +535,6 @@ else {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -614,7 +612,6 @@ else {
 			#write-host $output
 			$output | out-file -append $loglocation
 		}
-		Start-Sleep 3
 		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -661,7 +658,6 @@ else {
 			#write-host $output
 			$output | out-file -append $loglocation
 		}
-		Start-Sleep 3
 		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -711,7 +707,6 @@ else {
 			#write-host $output
 			$output | out-file -append $loglocation
 		}
-		Start-Sleep 3
 		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -759,7 +754,6 @@ If($CloudPolicyKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -807,7 +801,6 @@ If($LicensingNextKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -855,7 +848,6 @@ If($TemplatesKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -903,7 +895,6 @@ If($SettingsStoreKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -951,7 +942,6 @@ If($RoamIdKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -999,7 +989,6 @@ If($SerManCacheKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -1052,7 +1041,6 @@ If($TargetedMsgServKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -1104,7 +1092,6 @@ If($UrlRepkey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -1155,7 +1142,6 @@ If($AppsKey -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -1247,7 +1233,6 @@ If($FoldersTest -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -1316,7 +1301,6 @@ if($RmOneNoteFiles.IsPresent)
 			#write-host $output
 			$output | out-file -append $loglocation
 		}
-		Start-Sleep 3
 		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -1367,7 +1351,6 @@ If($OfficeData -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
@@ -1420,7 +1403,6 @@ If($cachedcreds -eq $False) {
 		#write-host $output
 		$output | out-file -append $loglocation
 	}
-	Start-Sleep 3
 	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
