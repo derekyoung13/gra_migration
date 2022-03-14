@@ -1523,6 +1523,13 @@ $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
 $output = $timestamp + " Counter : " + $counter
 $output | out-file -append $loglocation
 
+# If full script complete, skip
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	$wshell = New-Object -ComObject Wscript.Shell
+	$wshell.Popup("Migration complete, please open Outlook, Teams, and OneDrive and sign in")
+}
+
 # If most tasks complete (14/26) then mark full script as complete
 # If full script complete, skip
 $FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
@@ -1532,11 +1539,6 @@ If ($FullScriptCheck -eq $false){
 	}
 }
 
-# If full script complete, skip
-$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
-If ($FullScriptCheck -eq $false){
-	$wshell = New-Object -ComObject Wscript.Shell
-	$wshell.Popup("Migration complete, please open Outlook, Teams, and OneDrive and sign in")
-}
+
 
 #Read-Host -Prompt "Press any key to continue"
