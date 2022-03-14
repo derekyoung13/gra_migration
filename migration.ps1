@@ -487,116 +487,124 @@ If ($FullScriptCheck -eq $false){
 }
 $output | out-file -append $loglocation
 
-$OfficeCommon = Get-Item Registry::HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common -ErrorAction SilentlyContinue
+$FullScriptCheck = Test-Path -Path $outputlocation\full-script-complete.txt
+If ($FullScriptCheck -eq $false){
+	$OfficeCommon = Get-Item Registry::HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common -ErrorAction SilentlyContinue
 
-#Get the Any Identities of users.
-#Iterate through each of the Identities under Common\Identity\Identities
-#From each Identity, grab the ProviderID value, Put each into  the Identity Keys Value : SignedOutWAMUsers, seperate using semicolons
-$IdentityKey = Get-Item Registry::$OfficeCommon\Identity -ErrorAction SilentlyContinue
-$UserIdentityKeys = Get-ChildItem Registry::$IdentityKey\Identities -ErrorAction SilentlyContinue
+	#Get the Any Identities of users.
+	#Iterate through each of the Identities under Common\Identity\Identities
+	#From each Identity, grab the ProviderID value, Put each into  the Identity Keys Value : SignedOutWAMUsers, seperate using semicolons
+	$IdentityKey = Get-Item Registry::$OfficeCommon\Identity -ErrorAction SilentlyContinue
+	$UserIdentityKeys = Get-ChildItem Registry::$IdentityKey\Identities -ErrorAction SilentlyContinue
 
-$UserIdentityKeysCheck = Test-Path -Path Registry::$IdentityKey\Identities
-if($UserIdentityKeysCheck -eq $False) {
-	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
-	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
-	If ($TeamsProcess) {
-		# If 'Teams' process is running, stop it else do nothing
-		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
-		Start-Sleep 3
-		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " Teams process was running, so we stopped it"
-		#write-host $output
-		$output | out-file -append $loglocation
-	}
-	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	
-    $UserIdentityKeys = Get-ChildItem Registry::$IdentityKey\Identities -ErrorAction SilentlyContinue
-    $timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-    $output = $timestamp + " No users logged into Office "
-    #write-host $output
-    $output | out-file -append $loglocation
-}
-else {
-	# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
-	$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
-	If ($TeamsProcess) {
-		# If 'Teams' process is running, stop it else do nothing
-		$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
-		Start-Sleep 3
-		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " Teams process was running, so we stopped it"
-		#write-host $output
-		$output | out-file -append $loglocation
-	}
-	Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
-	
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-    $output = $timestamp + " UserIdentityKeys: " + $UserIdentityKeys + "\Identities"
-    #write-host $output
-    $output | out-file -append $loglocation
-	# Iterates each Key under the Identity, and pulls the ProviderID which is an ID for each user logged in.
-	$UserIdentityKeys | foreach {
-		$CurrentProviderID = (Get-ItemProperty Registry::$_ -Name ProviderID -ErrorAction SilentlyContinue).ProviderID
-		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " CurrentProviderID: " + $CurrentProviderID
-		#write-host $output
-		$output | out-file -append $loglocation
-		if([string]::IsNullOrWhiteSpace($SignedOutWAMUsers)) {
-			$SignedOutWAMUsers = $CurrentProviderID
+	$UserIdentityKeysCheck = Test-Path -Path Registry::$IdentityKey\Identities
+	if($UserIdentityKeysCheck -eq $False) {
+		# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+		$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+		If ($TeamsProcess) {
+			# If 'Teams' process is running, stop it else do nothing
+			$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+			Start-Sleep 3
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Teams process was running, so we stopped it"
+			#write-host $output
+			$output | out-file -append $loglocation
 		}
-		else {
-			$SignedOutWAMUsers = $SignedOutWAMUsers +";"+ $CurrentProviderID
-		}
-		#Optionally, we can set a DWORD =1 for the value SignedOut on Identity SubKey
-		#But they get removed next time you launch an Office program (the whole Subkey is removed)
-	}
-	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-	$output = $timestamp + " Generated SignedOutWAMUsers: " + $SignedOutWAMUsers
-	#write-host $output
-	$output | out-file -append $loglocation
+		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
 
-	#Compare the WAM to whats in the IdentityKey
-	$ExistingWAM = $IdentityKey.GetValue("SignedOutWAMUsers")
-	if(!($ExistingWAM -eq $null)) {
-		if(!($ExistingWAM)) {
-			#With the above null check, being here means empty
-			$NewWam = ($SignedOutWAMUsers)
-		}
-		else {
-			$NewWam = (($ExistingWAM +';'+ $SignedOutWAMUsers) -split ';' | Select -Unique)-join ';'
-		}
+		$UserIdentityKeys = Get-ChildItem Registry::$IdentityKey\Identities -ErrorAction SilentlyContinue
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " Prior WAM Existed: " + $ExistingWAM
+		$output = $timestamp + " No users logged into Office "
 		#write-host $output
 		$output | out-file -append $loglocation
-		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " New WAM: " + $NewWam
-		#write-host $output
-		$output | out-file -append $loglocation
-		Set-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $NewWam -ErrorAction SilentlyContinue
 	}
 	else {
-		# there wasnt one here before, so we create a new registry value and put our SignedOutWAMUsers in it.
-		$null = New-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $SignedOutWAMUsers -ErrorAction SilentlyContinue
+		# We need to make sure all the Office programs are closed, otherwise the IDentities Keys will be recreated and the user not logged out
+		$TeamProcess = Get-Process -ProcessName Teams -ErrorAction SilentlyContinue
+		If ($TeamsProcess) {
+			# If 'Teams' process is running, stop it else do nothing
+			$TeamsProcess | Stop-Process -Force -ErrorAction SilentlyContinue
+			Start-Sleep 3
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Teams process was running, so we stopped it"
+			#write-host $output
+			$output | out-file -append $loglocation
+		}
+		Get-Process -ProcessName EXCEL -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName POWERPNT -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName ONENOTE -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSACCESS -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName MSPUB -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName Outlook -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+		Get-Process -ProcessName OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue | Wait-Process
+
 		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
-		$output = $timestamp + " No Prior WAM, Creating new Value From Generated SignOutWAMUsers"
+		$output = $timestamp + " UserIdentityKeys: " + $UserIdentityKeys + "\Identities"
 		#write-host $output
-		$output | out-file -append $loglocation		
+		$output | out-file -append $loglocation
+		# Iterates each Key under the Identity, and pulls the ProviderID which is an ID for each user logged in.
+		$UserIdentityKeys | foreach {
+			$CurrentProviderID = (Get-ItemProperty Registry::$_ -Name ProviderID -ErrorAction SilentlyContinue).ProviderID
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " CurrentProviderID: " + $CurrentProviderID
+			#write-host $output
+			$output | out-file -append $loglocation
+			if([string]::IsNullOrWhiteSpace($SignedOutWAMUsers)) {
+				$SignedOutWAMUsers = $CurrentProviderID
+			}
+			else {
+				$SignedOutWAMUsers = $SignedOutWAMUsers +";"+ $CurrentProviderID
+			}
+			#Optionally, we can set a DWORD =1 for the value SignedOut on Identity SubKey
+			#But they get removed next time you launch an Office program (the whole Subkey is removed)
+		}
+		$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+		$output = $timestamp + " Generated SignedOutWAMUsers: " + $SignedOutWAMUsers
+		#write-host $output
+		$output | out-file -append $loglocation
+
+		#Compare the WAM to whats in the IdentityKey
+		$ExistingWAM = $IdentityKey.GetValue("SignedOutWAMUsers")
+		if(!($ExistingWAM -eq $null)) {
+			if(!($ExistingWAM)) {
+				#With the above null check, being here means empty
+				$NewWam = ($SignedOutWAMUsers)
+			}
+			else {
+				$NewWam = (($ExistingWAM +';'+ $SignedOutWAMUsers) -split ';' | Select -Unique)-join ';'
+			}
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " Prior WAM Existed: " + $ExistingWAM
+			#write-host $output
+			$output | out-file -append $loglocation
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " New WAM: " + $NewWam
+			#write-host $output
+			$output | out-file -append $loglocation
+			Set-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $NewWam -ErrorAction SilentlyContinue
+		}
+		else {
+			# there wasnt one here before, so we create a new registry value and put our SignedOutWAMUsers in it.
+			$null = New-ItemProperty Registry::$IdentityKey -Name SignedOutWAMUsers -Value $SignedOutWAMUsers -ErrorAction SilentlyContinue
+			$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+			$output = $timestamp + " No Prior WAM, Creating new Value From Generated SignOutWAMUsers"
+			#write-host $output
+			$output | out-file -append $loglocation		
+		}
 	}
+}
+Else {
+	$timestamp=Get-Date -Format "MM/dd/yyyy HH:mm"
+	$output = $timestamp + " SKIPPING: Office Identities already cleared"
+	$output | out-file -append $loglocation	
 }
     # Check if Identities Subkey was already deleted by script
     $IdentitiesKey = Test-Path -Path $outputlocation\office-identities-cleared.txt
